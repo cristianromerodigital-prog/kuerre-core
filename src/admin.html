@@ -1727,7 +1727,15 @@ tr:hover td{background:rgba(255,255,255,0.02);}
               <label class="form-label">URL del Web App (Apps Script)</label>
               <input class="form-input" id="ct-apps-url" placeholder="https://script.google.com/macros/s/.../exec">
             </div>
-            <button class="btn-sm btn-sec" style="margin-top:8px" onclick="ctSaveCfg()">Guardar URL</button>
+            <div class="form-group" style="margin-top:10px">
+              <label class="form-label">ID carpeta raíz de Drive</label>
+              <input class="form-input" id="ct-drive-root-id" placeholder="ID de la carpeta padre en Google Drive">
+            </div>
+            <div class="form-group" style="margin-top:10px">
+              <label class="form-label">ID hoja de servicios (Google Sheet)</label>
+              <input class="form-input" id="ct-presupuestos-id" placeholder="ID del Google Sheet con los servicios">
+            </div>
+            <button class="btn-sm btn-sec" style="margin-top:12px" onclick="ctSaveCfg()">Guardar configuración</button>
           </div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
@@ -7402,7 +7410,11 @@ const CT_CFG_KEY = 'crd_contratos_cfg';
 
 function initContratosPage() {
   const saved = S.get(CT_CFG_KEY);
-  if (saved && saved.url) document.getElementById('ct-apps-url').value = saved.url;
+  if (saved) {
+    if (saved.url)           document.getElementById('ct-apps-url').value = saved.url;
+    if (saved.driveRootId)   document.getElementById('ct-drive-root-id').value = saved.driveRootId;
+    if (saved.presupuestosId) document.getElementById('ct-presupuestos-id').value = saved.presupuestosId;
+  }
   document.getElementById('ct-dia-firma').valueAsDate = new Date();
   if (ctSvcData.length === 0 && ctGetUrl()) ctCargarServicios();
   ctInitSolicitudes();
@@ -7433,7 +7445,15 @@ function _ctBuildPage_UNUSED() {
           <label class="form-label">URL del Web App (Apps Script)</label>
           <input class="form-input" id="ct-apps-url" placeholder="https://script.google.com/macros/s/AKfy.../exec">
         </div>
-        <button class="btn-sm btn-sec" style="margin-top:8px" onclick="ctSaveCfg()">Guardar URL</button>
+        <div class="form-group" style="margin-top:10px">
+          <label class="form-label">ID carpeta raíz de Drive</label>
+          <input class="form-input" id="ct-drive-root-id" placeholder="ID de la carpeta padre en Google Drive">
+        </div>
+        <div class="form-group" style="margin-top:10px">
+          <label class="form-label">ID hoja de servicios (Google Sheet)</label>
+          <input class="form-input" id="ct-presupuestos-id" placeholder="ID del Google Sheet con los servicios">
+        </div>
+        <button class="btn-sm btn-sec" style="margin-top:12px" onclick="ctSaveCfg()">Guardar configuración</button>
       </div>
     </div>
 
@@ -7660,11 +7680,21 @@ function ctToggleCfg() {
 }
 
 function ctSaveCfg() {
-  const url = document.getElementById('ct-apps-url').value.trim();
+  const url            = document.getElementById('ct-apps-url').value.trim();
+  const driveRootId    = document.getElementById('ct-drive-root-id').value.trim();
+  const presupuestosId = document.getElementById('ct-presupuestos-id').value.trim();
   if (!url) { toast('Ingresá la URL del Apps Script', 'error'); return; }
-  S.set(CT_CFG_KEY, { url });
-  syncToCloud(CT_CFG_KEY, JSON.stringify({ url }));
-  toast('URL guardada');
+  const cfg = { url, driveRootId, presupuestosId };
+  S.set(CT_CFG_KEY, cfg);
+  syncToCloud(CT_CFG_KEY, JSON.stringify(cfg));
+  if (driveRootId || presupuestosId) {
+    const body = {};
+    if (driveRootId)    body.DRIVE_ROOT_ID   = driveRootId;
+    if (presupuestosId) body.PRESUPUESTOS_ID  = presupuestosId;
+    fetch(url, { method: 'POST', redirect: 'follow', body: JSON.stringify({ action: 'setConfig', ...body }) })
+      .catch(() => {});
+  }
+  toast('Configuración guardada');
   ctToggleCfg();
   ctCargarServicios();
 }
