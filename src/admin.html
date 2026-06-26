@@ -163,6 +163,8 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .form-label{display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:9px;font-weight:500;}
 .form-input,.form-textarea,.form-select{width:100%;background:var(--black3);border:1px solid rgba(255,255,255,0.07);color:var(--white);padding:12px 14px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:300;outline:none;transition:border-color 0.2s;resize:vertical;appearance:none;border-radius:6px;}
 .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--gold);}
+.form-input.finvalid{border-color:#e74c3c!important}
+.form-input.fvalid{border-color:rgba(37,211,102,0.4)!important}
 .form-input::placeholder,.form-textarea::placeholder{color:rgba(255,255,255,0.2);}
 .form-textarea{min-height:140px;}
 .form-select option{background:var(--black3);}
@@ -1791,7 +1793,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
             <div class="settings-section" style="margin-bottom:16px">
               <div class="settings-section-title">Datos del evento</div>
               <div style="margin-top:12px">
-                <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;font-size:12px;color:var(--gray2)"><input type="checkbox" id="ct-b-tiene-civil" onchange="ctToggleEvento('civil',this.checked)" style="accent-color:var(--gold)"> Incluir Ceremonia Civil</label>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;font-size:12px;color:var(--gray2)"><input type="checkbox" id="ct-b-tiene-civil" onchange="ctToggleEvento('civil',this.checked,this)" style="accent-color:var(--gold)"> Incluir Ceremonia Civil</label>
                 <div id="ct-sub-civil" style="display:none;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);padding:12px;margin-bottom:12px">
                   <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:10px">Ceremonia Civil</div>
                   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
@@ -1800,7 +1802,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
                     <div class="form-group"><label class="form-label">Dirección</label><input class="form-input" id="ct-b-civil-dir"></div>
                   </div>
                 </div>
-                <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;font-size:12px;color:var(--gray2)"><input type="checkbox" id="ct-b-tiene-reli" onchange="ctToggleEvento('reli',this.checked)" style="accent-color:var(--gold)"> Incluir Ceremonia Religiosa</label>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;font-size:12px;color:var(--gray2)"><input type="checkbox" id="ct-b-tiene-reli" onchange="ctToggleEvento('reli',this.checked,this)" style="accent-color:var(--gold)"> Incluir Ceremonia Religiosa</label>
                 <div id="ct-sub-reli" style="display:none;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);padding:12px;margin-bottom:12px">
                   <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:10px">Ceremonia Religiosa</div>
                   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
@@ -7928,7 +7930,7 @@ function _ctBuildPage_UNUSED() {
         <div class="settings-section" style="margin-bottom:16px">
           <div class="settings-section-title">Datos del evento</div>
           <div style="margin-top:12px">
-            <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;font-size:12px;color:var(--gray2)"><input type="checkbox" id="ct-b-tiene-civil" onchange="ctToggleEvento('civil',this.checked)" style="accent-color:var(--gold)"> Incluir Ceremonia Civil</label>
+            <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;font-size:12px;color:var(--gray2)"><input type="checkbox" id="ct-b-tiene-civil" onchange="ctToggleEvento('civil',this.checked,this)" style="accent-color:var(--gold)"> Incluir Ceremonia Civil</label>
             <div id="ct-sub-civil" style="display:none;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);padding:12px;margin-bottom:12px">
               <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:10px">Ceremonia Civil</div>
               <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
@@ -7937,7 +7939,7 @@ function _ctBuildPage_UNUSED() {
                 <div class="form-group"><label class="form-label">Dirección</label><input class="form-input" id="ct-b-civil-dir"></div>
               </div>
             </div>
-            <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;font-size:12px;color:var(--gray2)"><input type="checkbox" id="ct-b-tiene-reli" onchange="ctToggleEvento('reli',this.checked)" style="accent-color:var(--gold)"> Incluir Ceremonia Religiosa</label>
+            <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;font-size:12px;color:var(--gray2)"><input type="checkbox" id="ct-b-tiene-reli" onchange="ctToggleEvento('reli',this.checked,this)" style="accent-color:var(--gold)"> Incluir Ceremonia Religiosa</label>
             <div id="ct-sub-reli" style="display:none;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);padding:12px;margin-bottom:12px">
               <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:10px">Ceremonia Religiosa</div>
               <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
@@ -8186,8 +8188,9 @@ function ctSelTipo(tipo) {
   });
 }
 
-function ctToggleEvento(tipo, visible) {
-  const el = document.getElementById('ct-sub-' + tipo);
+function ctToggleEvento(tipo, visible, cb) {
+  const scope = cb ? cb.closest('[id$="-fields"]') : null;
+  const el = scope ? scope.querySelector('[id="ct-sub-' + tipo + '"]') : document.getElementById('ct-sub-' + tipo);
   if (el) el.style.display = visible ? 'block' : 'none';
 }
 
@@ -8214,6 +8217,51 @@ function ctFmt(n) {
 }
 
 function ctV(id) { return (document.getElementById(id)?.value || '').trim(); }
+
+const CT_VRULES = {
+  email: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+  tel:   v => v.replace(/\D/g,'').length >= 8,
+  dni:   v => /^\d{7,8}$/.test(v.replace(/[\s.]/g,'')),
+  hora:  v => /^\d{1,2}:\d{2}$/.test(v),
+  dir:   v => /\d/.test(v),
+  text:  v => v.trim().length >= 2,
+};
+function ctVf(id, type, req) {
+  const el = document.getElementById(id);
+  if (!el) return true;
+  const val = el.value.trim();
+  if (!val) {
+    el.classList.toggle('finvalid', !!req);
+    el.classList.remove('fvalid');
+    return !req;
+  }
+  const ok = CT_VRULES[type] ? CT_VRULES[type](val) : val.length > 0;
+  el.classList.toggle('finvalid', !ok);
+  el.classList.toggle('fvalid', ok);
+  return ok;
+}
+function ctChk(id, type, req, label, errs) {
+  if (!ctVf(id, type, req)) errs.push(label);
+}
+(function ctWireBlur() {
+  const rules = {
+    'ct-b-novia-nombre':['text',true], 'ct-b-novia-dni':['dni',true], 'ct-b-novia-tel':['tel',true], 'ct-b-novia-email':['email',false],
+    'ct-b-novio-nombre':['text',true], 'ct-b-novio-dni':['dni',true], 'ct-b-novio-dom':['text',false], 'ct-b-novio-tel':['tel',true], 'ct-b-novio-email':['email',false],
+    'ct-b-civil-hora':['hora',false], 'ct-b-civil-dir':['dir',false],
+    'ct-b-reli-hora':['hora',false], 'ct-b-reli-dir':['dir',false],
+    'ct-b-fiesta-hora':['hora',true], 'ct-b-fiesta-salon':['text',true], 'ct-b-fiesta-dir':['dir',true],
+    'ct-b-contacto-nombre':['text',true], 'ct-b-contacto-rel':['text',true], 'ct-b-contacto-tel':['tel',true],
+    'ct-x-quince-nombre':['text',true], 'ct-x-cliente-nombre':['text',true], 'ct-x-cliente-dni':['dni',true],
+    'ct-x-cliente-tel':['tel',true], 'ct-x-cliente-email':['email',true],
+    'ct-x-hora-inicio':['hora',true], 'ct-x-hora-fin':['hora',false], 'ct-x-salon':['text',true], 'ct-x-dir':['dir',true],
+    'ct-c-nombre':['text',true], 'ct-c-dni':['dni',true], 'ct-c-tel':['tel',true], 'ct-c-email':['email',true],
+    'ct-c-hora-inicio':['hora',true], 'ct-c-hora-fin':['hora',false], 'ct-c-salon':['text',true], 'ct-c-dir':['dir',true],
+  };
+  Object.entries(rules).forEach(([id,[type,req]])=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('blur',()=>ctVf(id,type,req));
+  });
+})();
 
 // ── FORMA DE PAGO ITEMS ──
 let ctPagoItems = [];
@@ -8251,6 +8299,56 @@ function ctRemovePagoItem(i) { ctPagoItems.splice(i, 1); ctRenderPagoItems(); }
 function ctBuildData() {
   const precio = Number(document.getElementById('ct-precio').value);
   if (!precio) { toast('Ingresá el precio total', 'error'); return null; }
+  const errs = [];
+  if (ctTipo === 'BODA') {
+    ctChk('ct-b-novia-nombre','text',true,'Nombre de la novia',errs);
+    ctChk('ct-b-novia-dni','dni',true,'DNI de la novia (7 u 8 dígitos)',errs);
+    ctChk('ct-b-novia-tel','tel',true,'Teléfono de la novia (mín. 8 dígitos)',errs);
+    if (ctV('ct-b-novia-email')) ctChk('ct-b-novia-email','email',false,'Email de la novia inválido',errs);
+    ctChk('ct-b-novio-nombre','text',true,'Nombre del novio',errs);
+    ctChk('ct-b-novio-dni','dni',true,'DNI del novio (7 u 8 dígitos)',errs);
+    ctChk('ct-b-novio-tel','tel',true,'Teléfono del novio (mín. 8 dígitos)',errs);
+    if (ctV('ct-b-novio-email')) ctChk('ct-b-novio-email','email',false,'Email del novio inválido',errs);
+    if (!ctV('ct-b-fiesta-fecha')) errs.push('Fecha de la fiesta');
+    ctChk('ct-b-fiesta-hora','hora',true,'Horario de fiesta inválido (formato HH:MM)',errs);
+    ctChk('ct-b-fiesta-salon','text',true,'Nombre del salón',errs);
+    ctChk('ct-b-fiesta-dir','dir',true,'Dirección del salón (debe incluir número)',errs);
+    ctChk('ct-b-contacto-nombre','text',true,'Nombre del contacto',errs);
+    ctChk('ct-b-contacto-rel','text',true,'Relación del contacto',errs);
+    ctChk('ct-b-contacto-tel','tel',true,'Teléfono del contacto (mín. 8 dígitos)',errs);
+    if (document.getElementById('ct-b-tiene-civil')?.checked) {
+      if (!ctV('ct-b-civil-fecha')) errs.push('Fecha de ceremonia civil');
+      if (ctV('ct-b-civil-hora')) ctChk('ct-b-civil-hora','hora',false,'Horario civil inválido (formato HH:MM)',errs);
+      if (ctV('ct-b-civil-dir')) ctChk('ct-b-civil-dir','dir',false,'Dirección civil debe incluir número',errs);
+    }
+    if (document.getElementById('ct-b-tiene-reli')?.checked) {
+      if (!ctV('ct-b-reli-fecha')) errs.push('Fecha de ceremonia religiosa');
+      if (ctV('ct-b-reli-hora')) ctChk('ct-b-reli-hora','hora',false,'Horario religioso inválido (formato HH:MM)',errs);
+      if (ctV('ct-b-reli-dir')) ctChk('ct-b-reli-dir','dir',false,'Dirección religiosa debe incluir número',errs);
+    }
+  } else if (ctTipo === 'XV') {
+    ctChk('ct-x-quince-nombre','text',true,'Nombre de la quinceañera',errs);
+    ctChk('ct-x-cliente-nombre','text',true,'Nombre del cliente',errs);
+    ctChk('ct-x-cliente-dni','dni',true,'DNI del cliente (7 u 8 dígitos)',errs);
+    ctChk('ct-x-cliente-tel','tel',true,'Teléfono del cliente (mín. 8 dígitos)',errs);
+    if (ctV('ct-x-cliente-email')) ctChk('ct-x-cliente-email','email',false,'Email del cliente inválido',errs);
+    if (!ctV('ct-x-fecha')) errs.push('Fecha del evento');
+    ctChk('ct-x-hora-inicio','hora',true,'Hora inicio inválida (formato HH:MM)',errs);
+    if (ctV('ct-x-hora-fin')) ctChk('ct-x-hora-fin','hora',false,'Hora fin inválida (formato HH:MM)',errs);
+    ctChk('ct-x-salon','text',true,'Nombre del salón',errs);
+    ctChk('ct-x-dir','dir',true,'Dirección del salón (debe incluir número)',errs);
+  } else if (ctTipo === 'CUMPLE') {
+    ctChk('ct-c-nombre','text',true,'Nombre del cliente',errs);
+    ctChk('ct-c-dni','dni',true,'DNI del cliente (7 u 8 dígitos)',errs);
+    ctChk('ct-c-tel','tel',true,'Teléfono del cliente (mín. 8 dígitos)',errs);
+    if (ctV('ct-c-email')) ctChk('ct-c-email','email',false,'Email del cliente inválido',errs);
+    if (!ctV('ct-c-fecha')) errs.push('Fecha del evento');
+    ctChk('ct-c-hora-inicio','hora',true,'Hora inicio inválida (formato HH:MM)',errs);
+    if (ctV('ct-c-hora-fin')) ctChk('ct-c-hora-fin','hora',false,'Hora fin inválida (formato HH:MM)',errs);
+    ctChk('ct-c-salon','text',true,'Nombre del salón',errs);
+    ctChk('ct-c-dir','dir',true,'Dirección del salón (debe incluir número)',errs);
+  }
+  if (errs.length) { toast('Revisá los campos:\n• ' + errs.join('\n• '), 'error'); return null; }
   const svcSel = ctSvcData
     .filter(s => document.getElementById(`ct-svc-${s.id}`)?.checked)
     .map(s => ({ descripcion: s.descripcion, pesos: s.pesos }));
