@@ -1,0 +1,291 @@
+      <!-- ═══════════════════════════════════════
+           CONTENT EDITOR PAGE
+      ═══════════════════════════════════════ -->
+      <div class="page" id="page-content">
+        <h2 class="section-h" style="margin-bottom:4px">Editor de Contenido</h2>
+        <p style="font-size:12px;color:var(--gray);margin-bottom:28px;letter-spacing:1px">Editá textos e imágenes del sitio. Se sincronizan automáticamente con el index.</p>
+
+        <!-- TABS -->
+        <div style="display:flex;gap:1px;background:rgba(255,255,255,0.06);margin-bottom:28px;flex-wrap:wrap">
+          <button class="cnt-tab active" onclick="switchContentTab('global',this)">Global</button>
+          <button class="cnt-tab" onclick="switchContentTab('hero',this)">Hero</button>
+          <button class="cnt-tab" onclick="switchContentTab('trust',this)">Trust Bar</button>
+          <button class="cnt-tab" onclick="switchContentTab('invitaciones',this)">Invitaciones</button>
+          <button class="cnt-tab" onclick="switchContentTab('qr',this)">QR Fiestas</button>
+          <button class="cnt-tab" onclick="switchContentTab('premiere',this)">Premiere</button>
+          <button class="cnt-tab" onclick="switchContentTab('servicios',this)">Servicios</button>
+          <button class="cnt-tab" onclick="switchContentTab('como',this)">Cómo Funciona</button>
+          <button class="cnt-tab" onclick="switchContentTab('faq',this)">FAQ</button>
+          <button class="cnt-tab" onclick="switchContentTab('cta',this)">CTA Final</button>
+        </div>
+
+        <!-- ── GLOBAL ── -->
+        <div class="cnt-panel" id="cnt-global">
+          <div class="settings-section">
+            <div class="settings-section-title">Datos globales del sitio</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Número WhatsApp (sin + ni espacios)</label><input class="form-input" id="cnt-global-wa" placeholder="541162557763"></div>
+              <div class="form-group"><label class="form-label">URL Instagram</label><input class="form-input" id="cnt-global-ig" placeholder="https://instagram.com/kuerre.digital"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Texto topbar izquierda</label><input class="form-input" id="cnt-global-topbar" placeholder="Buenos Aires, Argentina"></div>
+              <div class="form-group"><label class="form-label">Texto botón nav "Consultar"</label><input class="form-input" id="cnt-global-nav-cta" placeholder="Consultar"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">URL botón nav (WhatsApp)</label><input class="form-input" id="cnt-global-nav-cta-url" placeholder="https://wa.me/541162557763?text=..."></div>
+              <div class="form-group"><label class="form-label">Copyright footer</label><input class="form-input" id="cnt-global-footer" placeholder="© 2026 KUERRE · Servicios digitales para eventos"></div>
+            </div>
+          </div>
+          <button class="btn-add" onclick="saveContentSection('global')">Guardar Global</button>
+        </div>
+
+        <!-- ── HERO ── -->
+        <div class="cnt-panel" id="cnt-hero" style="display:none">
+          <div class="settings-section">
+            <div class="settings-section-title">Sección Hero</div>
+            <div class="form-group"><label class="form-label">Eyebrow (texto pequeño arriba del título)</label><input class="form-input" id="cnt-hero-eyebrow" placeholder="Servicios digitales para eventos"></div>
+            <div class="form-group"><label class="form-label">Título principal (Enter = salto de línea)</label><textarea class="form-textarea" id="cnt-hero-title" style="min-height:60px" placeholder="Hacé que tu evento&#10;viva para siempre"></textarea></div>
+            <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="cnt-hero-desc" placeholder="Galería colaborativa en tiempo real..."></textarea></div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Texto botón principal</label><input class="form-input" id="cnt-hero-btn1" placeholder="Consultá por WhatsApp"></div>
+              <div class="form-group"><label class="form-label">URL botón principal (WhatsApp)</label><input class="form-input" id="cnt-hero-btn1-url" placeholder="https://wa.me/..."></div>
+            </div>
+            <div class="form-group"><label class="form-label">Texto botón secundario</label><input class="form-input" id="cnt-hero-btn2" placeholder="Ver servicios"></div>
+            <div class="form-group"><label class="form-label">Imagen de fondo (URL)</label><input class="form-input" id="cnt-hero-bg" placeholder="https://images.unsplash.com/photo-..."></div>
+          </div>
+          <button class="btn-add" onclick="saveContentSection('hero')">Guardar Hero</button>
+        </div>
+
+        <!-- ── TRUST BAR ── -->
+        <div class="cnt-panel" id="cnt-trust" style="display:none">
+          <div class="settings-section">
+            <div class="settings-section-title">Trust Bar — 4 estadísticas</div>
+            <p style="font-size:12px;color:var(--gray);margin-bottom:16px;letter-spacing:1px">Número grande + etiqueta debajo para cada stat.</p>
+            <div class="form-row" style="margin-bottom:10px">
+              <div class="form-group"><label class="form-label">Número 1</label><input class="form-input" id="cnt-trust-num-0" placeholder="+100"></div>
+              <div class="form-group"><label class="form-label">Etiqueta 1</label><input class="form-input" id="cnt-trust-label-0" placeholder="Eventos realizados"></div>
+            </div>
+            <div class="form-row" style="margin-bottom:10px">
+              <div class="form-group"><label class="form-label">Número 2</label><input class="form-input" id="cnt-trust-num-1" placeholder="3"></div>
+              <div class="form-group"><label class="form-label">Etiqueta 2</label><input class="form-input" id="cnt-trust-label-1" placeholder="Servicios digitales"></div>
+            </div>
+            <div class="form-row" style="margin-bottom:10px">
+              <div class="form-group"><label class="form-label">Número 3</label><input class="form-input" id="cnt-trust-num-2" placeholder="0"></div>
+              <div class="form-group"><label class="form-label">Etiqueta 3</label><input class="form-input" id="cnt-trust-label-2" placeholder="Apps que instalar"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Número 4</label><input class="form-input" id="cnt-trust-num-3" placeholder="24h"></div>
+              <div class="form-group"><label class="form-label">Etiqueta 4</label><input class="form-input" id="cnt-trust-label-3" placeholder="Tiempo de respuesta"></div>
+            </div>
+          </div>
+          <button class="btn-add" onclick="saveContentSection('trust')">Guardar Trust Bar</button>
+        </div>
+
+        <!-- ── INVITACIONES ── -->
+        <div class="cnt-panel" id="cnt-invitaciones" style="display:none">
+          <div class="settings-section">
+            <div class="settings-section-title">Sección Invitaciones Digitales</div>
+            <div class="form-group"><label class="form-label">Label (texto pequeño)</label><input class="form-input" id="cnt-inv-label" placeholder="Invitación Digital"></div>
+            <div class="form-group"><label class="form-label">Título (Enter = salto de línea)</label><textarea class="form-textarea" id="cnt-inv-title" style="min-height:60px" placeholder="Animada, musical&#10;e interactiva"></textarea></div>
+            <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="cnt-inv-desc"></textarea></div>
+            <div class="settings-section-title" style="margin-top:16px;font-size:10px">Features (5 ítems)</div>
+            <div class="form-group"><label class="form-label">Feature 1</label><input class="form-input" id="cnt-inv-feat-0"></div>
+            <div class="form-group"><label class="form-label">Feature 2</label><input class="form-input" id="cnt-inv-feat-1"></div>
+            <div class="form-group"><label class="form-label">Feature 3</label><input class="form-input" id="cnt-inv-feat-2"></div>
+            <div class="form-group"><label class="form-label">Feature 4</label><input class="form-input" id="cnt-inv-feat-3"></div>
+            <div class="form-group"><label class="form-label">Feature 5</label><input class="form-input" id="cnt-inv-feat-4"></div>
+            <div class="form-row" style="margin-top:8px">
+              <div class="form-group"><label class="form-label">Texto botón</label><input class="form-input" id="cnt-inv-btn" placeholder="Consultar precio"></div>
+              <div class="form-group"><label class="form-label">URL botón (WhatsApp)</label><input class="form-input" id="cnt-inv-btn-url" placeholder="https://wa.me/..."></div>
+            </div>
+            <div class="form-group"><label class="form-label">Imagen de fondo (URL)</label><input class="form-input" id="cnt-inv-bg" placeholder="https://images.unsplash.com/..."></div>
+          </div>
+          <button class="btn-add" onclick="saveContentSection('invitaciones')">Guardar Invitaciones</button>
+        </div>
+
+        <!-- ── QR FIESTAS ── -->
+        <div class="cnt-panel" id="cnt-qr" style="display:none">
+          <div class="settings-section">
+            <div class="settings-section-title">Sección QR Fiestas</div>
+            <div class="form-group"><label class="form-label">Label (texto pequeño)</label><input class="form-input" id="cnt-qr-label" placeholder="QR Fiestas"></div>
+            <div class="form-group"><label class="form-label">Título (Enter = salto de línea)</label><textarea class="form-textarea" id="cnt-qr-title" style="min-height:60px" placeholder="La galería colaborativa&#10;de tu evento"></textarea></div>
+            <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="cnt-qr-desc"></textarea></div>
+            <div class="settings-section-title" style="margin-top:16px;font-size:10px">Features (5 ítems)</div>
+            <div class="form-group"><label class="form-label">Feature 1</label><input class="form-input" id="cnt-qr-feat-0"></div>
+            <div class="form-group"><label class="form-label">Feature 2</label><input class="form-input" id="cnt-qr-feat-1"></div>
+            <div class="form-group"><label class="form-label">Feature 3</label><input class="form-input" id="cnt-qr-feat-2"></div>
+            <div class="form-group"><label class="form-label">Feature 4</label><input class="form-input" id="cnt-qr-feat-3"></div>
+            <div class="form-group"><label class="form-label">Feature 5</label><input class="form-input" id="cnt-qr-feat-4"></div>
+            <div class="form-row" style="margin-top:8px">
+              <div class="form-group"><label class="form-label">Texto botón</label><input class="form-input" id="cnt-qr-btn" placeholder="Consultar precio"></div>
+              <div class="form-group"><label class="form-label">URL botón (WhatsApp)</label><input class="form-input" id="cnt-qr-btn-url" placeholder="https://wa.me/..."></div>
+            </div>
+            <div class="form-group"><label class="form-label">Imagen de fondo (URL)</label><input class="form-input" id="cnt-qr-bg" placeholder="https://images.unsplash.com/..."></div>
+          </div>
+          <button class="btn-add" onclick="saveContentSection('qr')">Guardar QR Fiestas</button>
+        </div>
+
+        <!-- ── PREMIERE ── -->
+        <div class="cnt-panel" id="cnt-premiere" style="display:none">
+          <div class="settings-section">
+            <div class="settings-section-title">Sección Premiere</div>
+            <div class="form-group"><label class="form-label">Label (texto pequeño)</label><input class="form-input" id="cnt-pm-label" placeholder="Premiere"></div>
+            <div class="form-group"><label class="form-label">Título (Enter = salto de línea)</label><textarea class="form-textarea" id="cnt-pm-title" style="min-height:60px" placeholder="La entrega que se siente&#10;como un estreno"></textarea></div>
+            <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="cnt-pm-desc"></textarea></div>
+            <div class="settings-section-title" style="margin-top:16px;font-size:10px">Features (5 ítems)</div>
+            <div class="form-group"><label class="form-label">Feature 1</label><input class="form-input" id="cnt-pm-feat-0"></div>
+            <div class="form-group"><label class="form-label">Feature 2</label><input class="form-input" id="cnt-pm-feat-1"></div>
+            <div class="form-group"><label class="form-label">Feature 3</label><input class="form-input" id="cnt-pm-feat-2"></div>
+            <div class="form-group"><label class="form-label">Feature 4</label><input class="form-input" id="cnt-pm-feat-3"></div>
+            <div class="form-group"><label class="form-label">Feature 5</label><input class="form-input" id="cnt-pm-feat-4"></div>
+            <div class="form-row" style="margin-top:8px">
+              <div class="form-group"><label class="form-label">Texto botón</label><input class="form-input" id="cnt-pm-btn" placeholder="Consultar precio"></div>
+              <div class="form-group"><label class="form-label">URL botón (WhatsApp)</label><input class="form-input" id="cnt-pm-btn-url" placeholder="https://wa.me/..."></div>
+            </div>
+            <div class="form-group"><label class="form-label">Imagen de fondo (URL)</label><input class="form-input" id="cnt-pm-bg" placeholder="https://images.unsplash.com/..."></div>
+          </div>
+          <button class="btn-add" onclick="saveContentSection('premiere')">Guardar Premiere</button>
+        </div>
+
+        <!-- ── SERVICIOS ── -->
+        <div class="cnt-panel" id="cnt-servicios" style="display:none">
+          <div class="settings-section">
+            <div class="settings-section-title">Encabezado de la sección</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Eyebrow</label><input class="form-input" id="cnt-svc-eyebrow" placeholder="Nuestros servicios"></div>
+              <div class="form-group"><label class="form-label">Título</label><input class="form-input" id="cnt-svc-title" placeholder="Tres experiencias digitales, un solo proveedor"></div>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">Card 1 — Invitación Digital</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" id="cnt-svc-name-0" placeholder="Invitación Digital"></div>
+              <div class="form-group"><label class="form-label">Precio (sin ARS)</label><input class="form-input" id="cnt-svc-price-0" placeholder="Desde $12.000"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="cnt-svc-desc-0"></textarea></div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">Card 2 — QR Fiestas</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" id="cnt-svc-name-1" placeholder="QR Fiestas"></div>
+              <div class="form-group"><label class="form-label">Precio (sin ARS)</label><input class="form-input" id="cnt-svc-price-1" placeholder="Desde $15.000"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="cnt-svc-desc-1"></textarea></div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">Card 3 — Premiere</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" id="cnt-svc-name-2" placeholder="Premiere"></div>
+              <div class="form-group"><label class="form-label">Precio (sin ARS)</label><input class="form-input" id="cnt-svc-price-2" placeholder="Desde $20.000"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="cnt-svc-desc-2"></textarea></div>
+          </div>
+          <button class="btn-add" onclick="saveContentSection('servicios')">Guardar Servicios</button>
+        </div>
+
+        <!-- ── CÓMO FUNCIONA ── -->
+        <div class="cnt-panel" id="cnt-como" style="display:none">
+          <div class="settings-section">
+            <div class="settings-section-title">Encabezado</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Eyebrow</label><input class="form-input" id="cnt-cf-eyebrow" placeholder="Proceso"></div>
+              <div class="form-group"><label class="form-label">Título</label><input class="form-input" id="cnt-cf-title" placeholder="Simple, rápido y sin complicaciones"></div>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">Paso 01</div>
+            <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" id="cnt-cf-step-name-0" placeholder="Consultás"></div>
+            <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="cnt-cf-step-desc-0"></textarea></div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">Paso 02</div>
+            <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" id="cnt-cf-step-name-1" placeholder="Personalizamos"></div>
+            <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="cnt-cf-step-desc-1"></textarea></div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">Paso 03</div>
+            <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" id="cnt-cf-step-name-2" placeholder="Lo recibís"></div>
+            <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="cnt-cf-step-desc-2"></textarea></div>
+          </div>
+          <button class="btn-add" onclick="saveContentSection('como')">Guardar Cómo Funciona</button>
+        </div>
+
+        <!-- ── FAQ ── -->
+        <div class="cnt-panel" id="cnt-faq" style="display:none">
+          <div class="settings-section">
+            <div class="settings-section-title">Encabezado</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Eyebrow</label><input class="form-input" id="cnt-faq-eyebrow" placeholder="Preguntas frecuentes"></div>
+              <div class="form-group"><label class="form-label">Título</label><input class="form-input" id="cnt-faq-title" placeholder="¿Tenés dudas? Las respondemos todas"></div>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">Preguntas y respuestas</div>
+            <div id="cnt-faq-list"></div>
+            <button class="btn-sm" onclick="addFaqItem()" style="margin-top:12px">+ Agregar pregunta</button>
+          </div>
+          <button class="btn-add" onclick="saveContentSection('faq')">Guardar FAQ</button>
+        </div>
+
+        <!-- ── CTA FINAL ── -->
+        <div class="cnt-panel" id="cnt-cta" style="display:none">
+          <div class="settings-section">
+            <div class="settings-section-title">CTA Final</div>
+            <div class="form-group"><label class="form-label">Título</label><input class="form-input" id="cnt-cta-title" placeholder="¿Listo para empezar?"></div>
+            <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="cnt-cta-desc"></textarea></div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Texto botón</label><input class="form-input" id="cnt-cta-btn" placeholder="Consultá por WhatsApp"></div>
+              <div class="form-group"><label class="form-label">URL botón (WhatsApp)</label><input class="form-input" id="cnt-cta-btn-url" placeholder="https://wa.me/..."></div>
+            </div>
+          </div>
+          <button class="btn-add" onclick="saveContentSection('cta')">Guardar CTA Final</button>
+        </div>
+
+      </div><!-- /page-content -->
+
+
+        <!-- Invite Media Browser Modal -->
+        <div id="inv-cloudinary-browser" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:3000;overflow-y:auto;padding:24px">
+          <div style="max-width:900px;margin:0 auto;background:var(--black2);border:1px solid rgba(255,255,255,0.1);padding:24px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <h3 style="font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--white)">☁ Seleccionar media de Cloudinary</h3>
+              <button onclick="document.getElementById('inv-cloudinary-browser').style.display='none'" style="background:none;border:none;color:var(--gray);font-size:20px;cursor:pointer">✕</button>
+            </div>
+            <p style="font-size:12px;color:var(--gray);margin-bottom:16px">Hacé clic en la imagen o video para usarlo como portada de la invitación.</p>
+            <div id="inv-browser-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px"></div>
+            <div id="inv-browser-loading" style="text-align:center;padding:40px;color:var(--gray);font-size:13px">Cargando...</div>
+          </div>
+        </div>
+
+        <!-- Cloudinary Browser Modal -->
+        <div id="cloudinary-browser" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;overflow-y:auto;padding:24px">
+          <div style="max-width:1000px;margin:0 auto;background:var(--black2);border:1px solid rgba(255,255,255,0.1);padding:24px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+              <h3 style="font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--white)">☁ Mis fotos en Cloudinary</h3>
+              <button onclick="document.getElementById('cloudinary-browser').style.display='none'" style="background:none;border:none;color:var(--gray);font-size:20px;cursor:pointer">✕</button>
+            </div>
+            <p style="font-size:12px;color:var(--gray);margin-bottom:16px">Hacé clic en las fotos para agregarlas al portfolio en la categoría seleccionada.</p>
+            <div id="cloudinary-browser-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px"></div>
+            <div id="cloudinary-browser-loading" style="text-align:center;padding:40px;color:var(--gray);font-size:13px">Cargando fotos...</div>
+          </div>
+        </div>
+
+
+        <!-- Category Manager Modal -->
+        <div id="category-manager" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:none;align-items:center;justify-content:center;padding:24px">
+          <div style="background:var(--black2);border:1px solid rgba(255,255,255,0.1);padding:28px;max-width:500px;width:100%;max-height:85vh;overflow-y:auto">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+              <h3 style="font-size:13px;letter-spacing:2px;text-transform:uppercase">⚙ Categorías del Portfolio</h3>
+              <button onclick="closeCategoryManager()" style="background:none;border:none;color:var(--gray);font-size:20px;cursor:pointer">✕</button>
+            </div>
+            <p style="font-size:12px;color:var(--gray);margin-bottom:16px">Habilitá, deshabilitá, renombrá o agregá categorías. Las deshabilitadas no aparecen en el sitio.</p>
+            <div id="category-list"></div>
+            <div style="margin-top:16px;display:flex;gap:8px">
+              <input class="form-input" id="new-category-name" placeholder="Nombre nueva categoría" style="flex:1;font-size:12px">
+              <input class="form-input" id="new-category-key" placeholder="clave (sin espacios)" style="width:140px;font-size:12px">
+              <button class="btn-sm" onclick="addCategory()">+ Agregar</button>
+            </div>
+            <button class="btn-add" onclick="saveCategoryManager()" style="margin-top:16px;width:100%">Guardar categorías</button>
+          </div>
+        </div>
+

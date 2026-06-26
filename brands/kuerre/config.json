@@ -1,0 +1,105 @@
+{
+  "outputs": [
+    "WEB KUERRE/Productivo/admin.html",
+    "WEB KUERRE/Desarrollo/admin.html"
+  ],
+  "contentSection": "content-section.html",
+  "patches": [
+    {
+      "_comment": "1. Version",
+      "find": ">V1.40<",
+      "replace": ">V1.48<"
+    },
+    {
+      "_comment": "2. CSS override KUERRE",
+      "find": "</style>\n<script src=\"https://upload-widget.cloudinary.com/global/all.js\"></script>",
+      "replace": "</style>\n\n<!-- ═══ KUERRE VISUAL OVERRIDE — SOLO COLORES ═══ -->\n<style>\n#sidebar-logo-img { display: none !important; }\n.sidebar-logo-text { font-size: 0 !important; color: transparent !important; }\n.sidebar-logo-text span { display: none !important; }\n.sidebar-logo-text::before { content: 'KUERRE'; display: block; font-family: 'DM Sans',sans-serif; font-size: 16px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; color: #9060b8; }\n:root { --gold: #9060b8; --gold2: #00e0a8; }\n.login-logo span        { color: #9060b8 !important; }\n.login-btn              { background: #9060b8 !important; color: #fff !important; }\n.login-btn:hover        { background: #7a4aa0 !important; }\n.login-input:focus      { border-color: #9060b8 !important; }\n.nav-section-label      { color: rgba(192,144,224,.4) !important; }\n.sidebar-item.active    { color: #9060b8 !important; background: rgba(144,96,184,.1) !important; }\n.sidebar-item.active svg { opacity: 1; }\n.tab.active             { color: #9060b8 !important; border-bottom-color: #9060b8 !important; }\n.cnt-tab.active, .cnt-subtab.active { background: #9060b8 !important; color: #fafafa !important; }\n.btn-add                { background: rgba(192,144,224,.18) !important; color: #9060b8 !important; border-color: rgba(192,144,224,.3) !important; }\n.btn-add:hover          { background: rgba(192,144,224,.28) !important; }\n.settings-section-title { color: #9060b8 !important; }\n.form-input:focus, .form-textarea:focus, .form-select:focus { border-color: #9060b8 !important; }\n</style>\n<!-- ═══ / KUERRE VISUAL OVERRIDE ═══ -->\n<script src=\"https://upload-widget.cloudinary.com/global/all.js\"></script>"
+    },
+    {
+      "_comment": "3. Quitar data-module (regex)",
+      "regex": " data-module=\"[^\"]*\"",
+      "flags": "g",
+      "replace": ""
+    },
+    {
+      "_comment": "4. Ocultar sidebar crclub",
+      "find": "onclick=\"showPage('crclub')\">",
+      "replace": "onclick=\"showPage('crclub')\" style=\"display:none\">"
+    },
+    {
+      "_comment": "5. CF_URL",
+      "find": "CF_URL:             '',",
+      "replace": "CF_URL:             'https://KUERRE-worker.cristian-romero-digital.workers.dev',"
+    },
+    {
+      "_comment": "6. CRCLUB_URL",
+      "find": "CRCLUB_URL:          '',",
+      "replace": "CRCLUB_URL:         'https://KUERRE-worker.cristian-romero-digital.workers.dev',"
+    },
+    {
+      "_comment": "7. CF_AUTH",
+      "find": "CF_AUTH:            '',",
+      "replace": "CF_AUTH:            'f3971df2e46013b8ada19aaf3e209d8ff00d518f200d2655',"
+    },
+    {
+      "_comment": "8. WEB_DEFAULT",
+      "find": "WEB_DEFAULT:         ''",
+      "replace": "WEB_DEFAULT:        'https://KUERRE.com.ar'"
+    },
+    {
+      "_comment": "9. CLIENTES_WORKER",
+      "find": "const CLIENTES_WORKER = '';",
+      "replace": "const CLIENTES_WORKER = 'https://KUERRE-worker.cristian-romero-digital.workers.dev';"
+    },
+    {
+      "_comment": "10. FIESTAS_WORKER",
+      "find": "const FIESTAS_WORKER = '';",
+      "replace": "const FIESTAS_WORKER = 'https://KUERRE-worker.cristian-romero-digital.workers.dev';"
+    },
+    {
+      "_comment": "11. CF_SYNC_KEYS quitar crd_site_logo",
+      "find": "\"crd_contratos_cfg\",\"crd_site_logo\",\"crd_ct_draft\"",
+      "replace": "\"crd_contratos_cfg\",\"crd_ct_draft\""
+    },
+    {
+      "_comment": "12. Quitar loadModules/applyModules (regex lazy entre comentarios)",
+      "regex": "\n\n// ─{3} Módulos [─ ]*\n[\\s\\S]*?\n}\n(?=\n// ─{2} AUTH)",
+      "replace": "\n"
+    },
+    {
+      "_comment": "13. DOMContentLoaded sin loadModules",
+      "find": "document.addEventListener('DOMContentLoaded', () => { init(); loadModules(); });",
+      "replace": "document.addEventListener('DOMContentLoaded', init);"
+    },
+    {
+      "_comment": "14. init() inline sin loadModules",
+      "find": "      init();\n      loadModules();",
+      "replace": "      init();"
+    },
+    {
+      "_comment": "15. showPage content usa initContentIfEmpty",
+      "find": "if (id === 'content') { loadContentPage(); setTimeout(loadDestinations, 100); }",
+      "replace": "if (id === 'content') { initContentIfEmpty(); loadContentPage(); }"
+    },
+    {
+      "_comment": "16. init() agregar localStorage.removeItem antes de _fetchClientes",
+      "find": "  _fetchClientes({ search: '', offset: 0 }).catch(function(){});\n  ctInitSolicitudes();",
+      "replace": "  // El logo base64 en localStorage revienta el cupo de 5MB — siempre limpiar al arrancar\n  localStorage.removeItem('crd_site_logo');\n  localStorage.removeItem('crd_site_logo_light');\n  _fetchClientes({ search: '', offset: 0 }).catch(function(){});\n  ctInitSolicitudes();"
+    },
+    {
+      "_comment": "17. Settings sync delete logoUrl en lugar de preservar",
+      "find": "    const local = S.get('crd_settings') || {};\n    if (!cloudSettings.logoUrl && local.logoUrl) cloudSettings.logoUrl = local.logoUrl;\n    if (!cloudSettings.logoFilter && local.logoFilter) cloudSettings.logoFilter = local.logoFilter;",
+      "replace": "    delete cloudSettings.logoUrl; delete cloudSettings.logoFilter; // limpiar si quedaron del ciclo anterior"
+    },
+    {
+      "_comment": "18. Logo sidebar usar localStorage.getItem + cleanup",
+      "find": "  // Logo sidebar: aplicar siempre al arrancar (desde localStorage o desde crd_settings de CF)\n  const _logoLocal = S.get('crd_site_logo');\n  if (_logoLocal) {\n    applySidebarLogo(_logoLocal);",
+      "replace": "  // Contenido CMS: siempre sincronizar del cloud (fuente de verdad cross-browser)\n  const cloudContent = await fetchFromCloud('crd_content');\n  if (cloudContent && typeof cloudContent === 'object') localStorage.setItem('crd_content', JSON.stringify(cloudContent));\n\n  // Logo sidebar — solo aplicar al DOM, nunca guardar en localStorage (base64 es demasiado grande)\n  const _logoLocal = localStorage.getItem('crd_site_logo');\n  if (_logoLocal) {\n    try { applySidebarLogo(JSON.parse(_logoLocal)); } catch(e) { applySidebarLogo(_logoLocal); }\n    localStorage.removeItem('crd_site_logo'); // limpiar si quedaron del ciclo anterior"
+    },
+    {
+      "_comment": "19. Video section agregar boton Drive",
+      "find": "                  <input class=\"form-input\" id=\"video-url-input\" placeholder=\"https://res.cloudinary.com/... o cualquier URL directa de .mp4\" oninput=\"previewVideoUrl(this.value)\">\n                  <p id=\"video-url-hint\" style=\"font-size:11px;color:var(--gray);margin-top:8px;line-height:1.7;letter-spacing:0.5px\">Pegá una URL directa de .mp4 o .webm</p>",
+      "replace": "                  <div style=\"display:flex;gap:8px\">\n                    <input class=\"form-input\" id=\"video-url-input\" placeholder=\"URL directa .mp4 o ID de Drive...\" style=\"flex:1\" oninput=\"previewVideoUrl(this.value)\">\n                    <button class=\"btn-sm\" onclick=\"pickVideoDrive()\">Drive</button>\n                  </div>\n                  <p id=\"video-url-hint\" style=\"font-size:11px;color:var(--gray);margin-top:8px;line-height:1.7;letter-spacing:0.5px\">Pegá una URL .mp4 o seleccioná desde Drive</p>"
+    }
+  ]
+}

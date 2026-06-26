@@ -1,0 +1,93 @@
+{
+  "outputs": [
+    "WEB CRP/Productivo/admin.html"
+  ],
+  "patches": [
+    {
+      "_comment": "1. Version",
+      "find": ">V1.40<",
+      "replace": ">V1.41<"
+    },
+    {
+      "_comment": "2. Quitar data-module (regex)",
+      "regex": " data-module=\"[^\"]*\"",
+      "flags": "g",
+      "replace": ""
+    },
+    {
+      "_comment": "3. CF_URL",
+      "find": "CF_URL:             '',",
+      "replace": "CF_URL:             'https://web.cristian-romero-digital.workers.dev',"
+    },
+    {
+      "_comment": "4. CRCLUB_URL",
+      "find": "CRCLUB_URL:          '',",
+      "replace": "CRCLUB_URL:         'https://crclub-worker.cristian-romero-digital.workers.dev',"
+    },
+    {
+      "_comment": "5. WA_DEFAULT",
+      "find": "WA_DEFAULT:          '',",
+      "replace": "WA_DEFAULT:         '+5491162557763',"
+    },
+    {
+      "_comment": "6. IG_DEFAULT",
+      "find": "IG_DEFAULT:          '',",
+      "replace": "IG_DEFAULT:         'https://instagram.com/cristian.romero.digital',"
+    },
+    {
+      "_comment": "7. WEB_DEFAULT",
+      "find": "WEB_DEFAULT:         ''",
+      "replace": "WEB_DEFAULT:        'https://cristianromeroproducciones.com.ar'"
+    },
+    {
+      "_comment": "8. CLIENTES_WORKER",
+      "find": "const CLIENTES_WORKER = '';",
+      "replace": "const CLIENTES_WORKER = 'https://crclub-worker.cristian-romero-digital.workers.dev';"
+    },
+    {
+      "_comment": "9. FIESTAS_WORKER",
+      "find": "const FIESTAS_WORKER = '';",
+      "replace": "const FIESTAS_WORKER = 'https://crclub-worker.cristian-romero-digital.workers.dev';"
+    },
+    {
+      "_comment": "10. Quitar loadModules/applyModules (regex)",
+      "regex": "\n\n// ─{3} Módulos [─ ]*\n[\\s\\S]*?\n}\n(?=\n// ─{2} AUTH)",
+      "replace": "\n"
+    },
+    {
+      "_comment": "11. DOMContentLoaded sin loadModules",
+      "find": "document.addEventListener('DOMContentLoaded', () => { init(); loadModules(); });",
+      "replace": "document.addEventListener('DOMContentLoaded', init);"
+    },
+    {
+      "_comment": "12. init() inline sin loadModules",
+      "find": "      init();\n      loadModules();",
+      "replace": "      init();"
+    },
+    {
+      "_comment": "13. Settings sync delete logoUrl",
+      "find": "    const local = S.get('crd_settings') || {};\n    if (!cloudSettings.logoUrl && local.logoUrl) cloudSettings.logoUrl = local.logoUrl;\n    if (!cloudSettings.logoFilter && local.logoFilter) cloudSettings.logoFilter = local.logoFilter;",
+      "replace": "    delete cloudSettings.logoUrl; delete cloudSettings.logoFilter; // limpiar si quedaron del ciclo anterior"
+    },
+    {
+      "_comment": "14. Logo sidebar usar localStorage.getItem + cleanup",
+      "find": "  // Logo sidebar: aplicar siempre al arrancar (desde localStorage o desde crd_settings de CF)\n  const _logoLocal = S.get('crd_site_logo');\n  if (_logoLocal) {\n    applySidebarLogo(_logoLocal);",
+      "replace": "  // Logo sidebar — solo aplicar al DOM, nunca guardar en localStorage (base64 es demasiado grande)\n  const _logoLocal = localStorage.getItem('crd_site_logo');\n  if (_logoLocal) {\n    try { applySidebarLogo(JSON.parse(_logoLocal)); } catch(e) { applySidebarLogo(_logoLocal); }\n    localStorage.removeItem('crd_site_logo'); // limpiar si quedaron del ciclo anterior"
+    },
+    {
+      "_comment": "15. Contratos config HTML simplificado (sin driveRootId/presupuestosId)",
+      "find": "            <div class=\"form-group\" style=\"margin-top:10px\">\n              <label class=\"form-label\">ID carpeta raíz de Drive</label>\n              <input class=\"form-input\" id=\"ct-drive-root-id\" placeholder=\"ID de la carpeta padre en Google Drive\">\n            </div>\n            <div class=\"form-group\" style=\"margin-top:10px\">\n              <label class=\"form-label\">ID hoja de servicios (Google Sheet)</label>\n              <input class=\"form-input\" id=\"ct-presupuestos-id\" placeholder=\"ID del Google Sheet con los servicios\">\n            </div>\n            <button class=\"btn-sm btn-sec\" style=\"margin-top:12px\" onclick=\"ctSaveCfg()\">Guardar configuración</button>",
+      "replace": "            <button class=\"btn-sm btn-sec\" style=\"margin-top:8px\" onclick=\"ctSaveCfg()\">Guardar URL</button>"
+    },
+    {
+      "_comment": "16. ctSaveCfg JS simplificado — primera linea",
+      "find": "  const url            = document.getElementById('ct-apps-url').value.trim();\n  const driveRootId    = document.getElementById('ct-drive-root-id').value.trim();\n  const presupuestosId = document.getElementById('ct-presupuestos-id').value.trim();",
+      "replace": "  const url = document.getElementById('ct-apps-url').value.trim();"
+    },
+    {
+      "_comment": "17. ctSaveCfg JS simplificado — body",
+      "find": "  const cfg = { url, driveRootId, presupuestosId };\n  S.set(CT_CFG_KEY, cfg);\n  syncToCloud(CT_CFG_KEY, JSON.stringify(cfg));\n  if (driveRootId || presupuestosId) {\n    const body = {};\n    if (driveRootId)    body.DRIVE_ROOT_ID   = driveRootId;\n    if (presupuestosId) body.PRESUPUESTOS_ID  = presupuestosId;\n    fetch(url, { method: 'POST', redirect: 'follow', body: JSON.stringify({ action: 'setConfig', ...body }) })\n      .catch(() => {});\n  }\n  toast('Configuración guardada');",
+      "replace": "  S.set(CT_CFG_KEY, { url });\n  syncToCloud(CT_CFG_KEY, JSON.stringify({ url }));\n  toast('URL guardada');"
+    }
+  ]
+}
