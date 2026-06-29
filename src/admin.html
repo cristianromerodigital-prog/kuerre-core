@@ -8611,6 +8611,8 @@ function ctRenderSolicitudes(data) {
 
 async function ctCargarSolicitud(sol) {
   _ctSolicitudId = sol.id || null;
+  const prevDraft = S.get(CT_DRAFT_KEY);
+  const prevPagoItems = (prevDraft && prevDraft.solicitudId === sol.id && Array.isArray(prevDraft.pagoItems)) ? prevDraft.pagoItems : null;
   showPage('contratos');
   const d = sol.data;
   ctSelTipo(sol.tipo);
@@ -8659,6 +8661,7 @@ async function ctCargarSolicitud(sol) {
   }
 
 
+  if (prevPagoItems) { ctPagoItems = prevPagoItems; ctRenderPagoItems(); }
   setTimeout(ctSaveDraft, 200);
   toast('Datos cargados del cliente — completá precio y servicios');
   document.getElementById('ct-form-area').scrollIntoView({ behavior: 'smooth' });
