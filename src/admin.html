@@ -8522,7 +8522,7 @@ function ctSaveDraft() {
     if (!el.id) return;
     fields[el.id] = el.type === 'checkbox' ? el.checked : el.value;
   });
-  S.set(CT_DRAFT_KEY, { tipo: ctTipo, fields, solicitudId: _ctSolicitudId || null });
+  S.set(CT_DRAFT_KEY, { tipo: ctTipo, fields, solicitudId: _ctSolicitudId || null, pagoItems: ctPagoItems });
 }
 
 function ctRestoreDraft() {
@@ -8536,6 +8536,7 @@ function ctRestoreDraft() {
 function _ctApplyDraft(draft) {
   ctSelTipo(draft.tipo);
   if (draft.solicitudId) _ctSolicitudId = draft.solicitudId;
+  if (draft.pagoItems && Array.isArray(draft.pagoItems)) { ctPagoItems = draft.pagoItems; ctRenderPagoItems(); }
   setTimeout(() => {
     Object.entries(draft.fields || {}).forEach(([id, val]) => {
       const el = document.getElementById(id);
