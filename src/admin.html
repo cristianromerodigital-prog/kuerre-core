@@ -3585,7 +3585,7 @@ async function cargarMasClientes() {
 }
 
 function renderClientes() {
-  const list = _clientes;
+  const list = _clientes.slice().sort(function(a, b) { return (b.fecha || '').localeCompare(a.fecha || ''); });
   const el = document.getElementById('clientes-list');
   if (!list.length) {
     el.innerHTML = '<div style="color:var(--gray2);font-size:12px;padding:20px 0">Sin registros. Los clientes aparecerán aquí al completar el formulario de solicitud.</div>';
@@ -8013,8 +8013,6 @@ async function initContratosPage() {
   const saved = S.get(CT_CFG_KEY);
   if (saved) {
     if (saved.url)           document.getElementById('ct-apps-url').value = saved.url;
-    if (saved.driveRootId)   document.getElementById('ct-drive-root-id').value = saved.driveRootId;
-    if (saved.presupuestosId) document.getElementById('ct-presupuestos-id').value = saved.presupuestosId;
   }
   document.getElementById('ct-dia-firma').valueAsDate = new Date();
   if (ctSvcData.length === 0 && ctGetUrl()) ctCargarServicios();
@@ -8027,8 +8025,6 @@ async function initContratosPage() {
     const hadUrl = !!(saved && saved.url);
     S.set(CT_CFG_KEY, cloud);
     document.getElementById('ct-apps-url').value = cloud.url;
-    if (cloud.driveRootId) document.getElementById('ct-drive-root-id').value = cloud.driveRootId;
-    if (cloud.presupuestosId) document.getElementById('ct-presupuestos-id').value = cloud.presupuestosId;
     if (!hadUrl) { ctCargarServicios(); ctLoadHistorial(); }
   }
   ctRestoreDraft();
@@ -8994,11 +8990,29 @@ async function ctLoadHistorial() {
   }
 }
 
+function _parseFechaEsLarga(str) {
+  if (!str) return null;
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const m = String(str).toLowerCase().match(/(\d{1,2}) de ([a-záéíóúñ]+) de (\d{4})/);
+  if (!m) return null;
+  const mesIdx = meses.indexOf(m[2]);
+  if (mesIdx < 0) return null;
+  return new Date(Number(m[3]), mesIdx, Number(m[1]));
+}
+
 function ctRenderHistorial(data) {
   const el = document.getElementById('ct-hist-list');
   if (!data.length) { el.innerHTML = '<div style="color:var(--gray);font-size:12px">No hay contratos registrados.</div>'; return; }
-  const reversed = data.slice().reverse();
-  const rows = reversed.map((c, i) => `
+  const ordenado = data.slice().sort(function(a, b) {
+    const da = _parseFechaEsLarga(a.fechaEvento), db = _parseFechaEsLarga(b.fechaEvento);
+    if (!da && !db) return 0;
+    if (!da) return 1;
+    if (!db) return -1;
+    return db - da;
+  });
+  const rows = ordenado.map((c) => {
+    const idx = data.indexOf(c);
+    return `
     <tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
       <td style="padding:8px 10px;font-size:12px;color:var(--gold);white-space:nowrap">${c.numero}</td>
       <td style="padding:8px 10px;font-size:11px;color:var(--gray);letter-spacing:1px">${c.tipo}</td>
@@ -9008,10 +9022,11 @@ function ctRenderHistorial(data) {
       <td style="padding:8px 10px;white-space:nowrap">
         ${c.docUrl ? `<a href="${c.docUrl}" target="_blank" style="font-size:10px;color:var(--gold);text-decoration:none;margin-right:8px">DOC</a>` : ''}
         ${c.pdfUrl ? `<a href="${c.pdfUrl}" target="_blank" style="font-size:10px;color:var(--red);text-decoration:none;margin-right:8px">PDF</a>` : ''}
-        <button onclick="ctCargarContrato(${data.length - 1 - i})" style="font-size:10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);color:var(--gold);padding:3px 8px;cursor:pointer;margin-right:4px">Cargar</button>
+        <button onclick="ctCargarContrato(${idx})" style="font-size:10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);color:var(--gold);padding:3px 8px;cursor:pointer;margin-right:4px">Cargar</button>
         <button onclick="ctDeleteContrato('${c.numero}')" style="font-size:10px;background:rgba(224,85,85,0.1);border:1px solid rgba(224,85,85,0.3);color:var(--red);padding:3px 8px;cursor:pointer">Borrar</button>
       </td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
   el.innerHTML = `<table style="width:100%;border-collapse:collapse">
     <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.08)">
       <th style="padding:6px 10px;font-size:9px;letter-spacing:2px;color:var(--gray);text-align:left;text-transform:uppercase">N°</th>
