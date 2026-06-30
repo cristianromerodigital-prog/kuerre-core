@@ -889,6 +889,16 @@ tr:hover td{background:rgba(255,255,255,0.02);}
                 <input class="form-input" id="inv-emailjs-template" placeholder="template_rsvp">
                 <small style="color:var(--gray);font-size:10px;margin-top:4px;display:block">Si lo completás, también recibirás un email por cada RSVP.</small>
               </div>
+              <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
+                <label class="form-label">Panel de Invitados</label>
+                <small style="color:var(--gray);font-size:10px;margin-bottom:10px;display:block">Las confirmaciones se guardan automáticamente. Generá un link para que el cliente vea quién confirmó.</small>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+                  <button type="button" class="btn-sm" onclick="genRsvpPanelLink()" id="btn-gen-rsvp">Generar link</button>
+                  <button type="button" class="btn-sm" style="display:none;color:#25D366;border-color:#25D366" onclick="copyRsvpPanelLink()" id="btn-copy-rsvp">WhatsApp 📲</button>
+                </div>
+                <div id="inv-rsvp-panel-url" style="font-size:10px;color:var(--gold);word-break:break-all;margin-bottom:8px"></div>
+                <div id="inv-rsvp-summary" style="font-size:11px;color:var(--gray2)"></div>
+              </div>
             </div>
 
             <!-- SPOTIFY -->
@@ -6260,6 +6270,12 @@ function openInviteModal(id) {
     invPreviewMedia(c.media_url, c.media_type);
     setHeroTextPos(c.hero_text_x || 0, c.hero_text_y || 0);
     invSetMode(c.tipo === 'save_the_date' ? 'save_the_date' : 'invitacion');
+    document.getElementById('inv-rsvp-summary').textContent = '';
+    document.getElementById('inv-rsvp-panel-url').textContent = '';
+    document.getElementById('inv-rsvp-panel-url').dataset.url = '';
+    document.getElementById('btn-copy-rsvp').style.display = 'none';
+    document.getElementById('btn-gen-rsvp').textContent = 'Generar link';
+    if (inv.slug) loadRsvpSummary(inv.slug);
   } else {
     invSetMode('invitacion');
     document.getElementById('inv-id').value = '';
@@ -6362,6 +6378,54 @@ function setHeroTextPos(x, y) {
   document.getElementById('inv-text-y').value = y;
   document.getElementById('inv-text-x-val').textContent = x;
   document.getElementById('inv-text-y-val').textContent = y;
+}
+
+async function genRsvpPanelLink() {
+  const slug = (document.getElementById('inv-slug').value || '').trim();
+  if (!slug) { toast('Guardá la invitación primero para generar el link', 'error'); return; }
+  const btn = document.getElementById('btn-gen-rsvp');
+  btn.textContent = 'Generando...'; btn.disabled = true;
+  try {
+    const res = await fetch(CONFIG.CRCLUB_URL + '/rsvp-token/' + slug, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + getAdminJWT() }
+    });
+    const data = await res.json();
+    if (!data.token) throw new Error('Sin token');
+    const url = 'https://cristianromeroproducciones.com.ar/rsvp-panel.html?slug=' + encodeURIComponent(slug) + '&t=' + encodeURIComponent(data.token);
+    document.getElementById('inv-rsvp-panel-url').textContent = url;
+    document.getElementById('inv-rsvp-panel-url').dataset.url = url;
+    document.getElementById('btn-copy-rsvp').style.display = '';
+    toast('Link generado');
+    loadRsvpSummary(slug);
+  } catch(e) {
+    toast('Error al generar link', 'error');
+  } finally {
+    btn.textContent = 'Regenerar link'; btn.disabled = false;
+  }
+}
+
+function copyRsvpPanelLink() {
+  const url = document.getElementById('inv-rsvp-panel-url').dataset.url || '';
+  if (!url) return;
+  const wa = 'https://wa.me/?text=' + encodeURIComponent('Podés ver los confirmados de tu invitación acá:\n' + url);
+  window.open(wa, '_blank');
+}
+
+async function loadRsvpSummary(slug) {
+  if (!slug) return;
+  try {
+    const res = await fetch(CONFIG.CRCLUB_URL + '/rsvp/' + slug, {
+      headers: { 'Authorization': 'Bearer ' + getAdminJWT() }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const el = document.getElementById('inv-rsvp-summary');
+    if (!el) return;
+    el.innerHTML = data.total
+      ? '✅ ' + data.total_si + ' confirmados · ❌ ' + data.total_no + ' no asisten · Total: ' + data.total
+      : 'Aún no hay confirmaciones.';
+  } catch(e) {}
 }
 
 function saveInvite() {
