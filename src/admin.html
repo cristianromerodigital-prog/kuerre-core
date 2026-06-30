@@ -6383,7 +6383,7 @@ function copyInviteWa(id) {
   genInviteUrl(inv).then(url => {
     const slug = new URLSearchParams(url.split('?')[1] || '').get('i');
     if (!slug) { navigator.clipboard.writeText(url).then(() => toast('URL copiada ✓')); return; }
-    const waUrl = CONFIG.CF_URL + '/og/' + slug;
+    const waUrl = 'https://cristianromeroproducciones.com.ar/og/' + slug;
     navigator.clipboard.writeText(waUrl).then(() => toast('URL WhatsApp copiada ✓'));
   });
 }
