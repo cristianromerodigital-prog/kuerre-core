@@ -710,6 +710,31 @@ tr:hover td{background:rgba(255,255,255,0.02);}
               <video id="inv-media-preview-vid" class="inv-media-preview" muted autoplay loop playsinline></video>
             </div>
 
+            <!-- POSICIÓN TEXTO PORTADA -->
+            <div class="inv-modal-section">
+              <div class="inv-modal-section-title">Posición del Texto en Portada</div>
+              <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+                <div style="display:grid;grid-template-columns:repeat(3,40px);grid-template-rows:repeat(3,40px);gap:4px">
+                  <div></div>
+                  <button type="button" onclick="nudgeHeroText(0,-20)" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--white);font-size:18px;cursor:pointer;border-radius:4px">↑</button>
+                  <div></div>
+                  <button type="button" onclick="nudgeHeroText(-20,0)" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--white);font-size:18px;cursor:pointer;border-radius:4px">←</button>
+                  <button type="button" onclick="resetHeroTextPos()" style="background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);color:var(--gold);font-size:13px;cursor:pointer;border-radius:4px" title="Centrar">⊙</button>
+                  <button type="button" onclick="nudgeHeroText(20,0)" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--white);font-size:18px;cursor:pointer;border-radius:4px">→</button>
+                  <div></div>
+                  <button type="button" onclick="nudgeHeroText(0,20)" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:var(--white);font-size:18px;cursor:pointer;border-radius:4px">↓</button>
+                  <div></div>
+                </div>
+                <div style="font-size:12px;color:var(--gray2);line-height:1.8">
+                  <div>X: <span id="inv-text-x-val" style="color:var(--gold);font-family:monospace;font-size:13px">0</span> px</div>
+                  <div>Y: <span id="inv-text-y-val" style="color:var(--gold);font-family:monospace;font-size:13px">0</span> px</div>
+                  <div style="font-size:10px;color:var(--gray);margin-top:6px">Cada paso = 20px · ⊙ centra</div>
+                </div>
+              </div>
+              <input type="hidden" id="inv-text-x" value="0">
+              <input type="hidden" id="inv-text-y" value="0">
+            </div>
+
             <!-- HORARIOS -->
             <div class="inv-modal-section">
               <div class="inv-modal-section-title">Horarios del Evento</div>
@@ -6065,16 +6090,15 @@ async function genInviteUrl(inv) {
   const slug = nombre + (fecha ? '-' + fecha : '') + '-' + suffix;
   const base = getInvBaseUrl();
   try {
-    await fetch(CONFIG.CF_URL + '/invite/' + slug, {
+    const res = await fetch(CONFIG.CF_URL + '/invite/' + slug, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': CONFIG.CF_AUTH },
       body: JSON.stringify(inv.config)
     });
-    return base + '?i=' + slug;
-  } catch(e) {
-    const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(inv.config)))));
-    return base + '?c=' + encoded;
-  }
+    if (res.ok) return base + '?i=' + slug;
+  } catch(e) {}
+  const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(inv.config)))));
+  return base + '?c=' + encoded;
 }
 
 function renderInvitesPage() {
@@ -6125,6 +6149,7 @@ function renderInvitesPage() {
         <div class="inv-card-url">${url}</div>
         <div class="inv-card-actions">
           <button class="btn-sm" onclick="copyInviteUrl('${inv.id}')">Copiar URL</button>
+          <button class="btn-sm" style="color:#25D366;border-color:#25D366" onclick="copyInviteWa('${inv.id}')" title="URL optimizada para WhatsApp (con preview del nombre y foto)">WhatsApp 📲</button>
           <button class="btn-sm" onclick="previewInvite('${inv.id}')">Previsualizar</button>
           <button class="btn-sm" onclick="openInviteModal('${inv.id}')">Editar</button>
           <button class="btn-sm" onclick="duplicateInvite('${inv.id}')">Duplicar</button>
@@ -6192,6 +6217,7 @@ function openInviteModal(id) {
     slugEl.value = inv.slug || '';
     slugEl.dataset.manual = inv.slug ? '1' : '';
     invPreviewMedia(c.media_url, c.media_type);
+    setHeroTextPos(c.hero_text_x || 0, c.hero_text_y || 0);
     invSetMode(c.tipo === 'save_the_date' ? 'save_the_date' : 'invitacion');
   } else {
     invSetMode('invitacion');
@@ -6215,6 +6241,7 @@ function openInviteModal(id) {
     document.getElementById('inv-tipo').value = 'casamiento';
     document.getElementById('inv-color-esquema').value = 'negro';
     document.getElementById('inv-estilo-aero').checked = false;
+    setHeroTextPos(0, 0);
     ['inv-media-preview-img','inv-media-preview-vid'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
     invTipoChange();
   }
@@ -6275,10 +6302,25 @@ function readInviteForm() {
       estilo_aero: document.getElementById('inv-estilo-aero').checked,
       logo_dark: S.get('crd_site_logo') || '',
       logo_light: S.get('crd_site_logo') || '',
-      logo_filter: S.get('crd_site_logo_filter') || ''
+      logo_filter: S.get('crd_site_logo_filter') || '',
+      hero_text_x: parseInt(document.getElementById('inv-text-x').value) || 0,
+      hero_text_y: parseInt(document.getElementById('inv-text-y').value) || 0
     },
     slug: document.getElementById('inv-slug').value.trim() || toSlug(document.getElementById('inv-novios').value.trim()) || 'invitacion'
   };
+}
+
+function nudgeHeroText(dx, dy) {
+  const x = (parseInt(document.getElementById('inv-text-x').value) || 0) + dx;
+  const y = (parseInt(document.getElementById('inv-text-y').value) || 0) + dy;
+  setHeroTextPos(x, y);
+}
+function resetHeroTextPos() { setHeroTextPos(0, 0); }
+function setHeroTextPos(x, y) {
+  document.getElementById('inv-text-x').value = x;
+  document.getElementById('inv-text-y').value = y;
+  document.getElementById('inv-text-x-val').textContent = x;
+  document.getElementById('inv-text-y-val').textContent = y;
 }
 
 function saveInvite() {
@@ -6333,6 +6375,17 @@ function saveAndPreviewInvite() {
 function previewInvite(id) {
   const inv = getInvites().find(i => i.id === id);
   if (inv) genInviteUrl(inv).then(url => window.open(url, '_blank'));
+}
+
+function copyInviteWa(id) {
+  const inv = getInvites().find(i => i.id === id);
+  if (!inv) return;
+  genInviteUrl(inv).then(url => {
+    const slug = new URLSearchParams(url.split('?')[1] || '').get('i');
+    if (!slug) { navigator.clipboard.writeText(url).then(() => toast('URL copiada ✓')); return; }
+    const waUrl = CONFIG.CF_URL + '/og/' + slug;
+    navigator.clipboard.writeText(waUrl).then(() => toast('URL WhatsApp copiada ✓'));
+  });
 }
 
 function copyInviteUrl(id) {
