@@ -12,28 +12,36 @@ export async function handleEventosAdmin(path, method, request, env) {
   }
 
   if (path === '/eventos/admin' && method === 'POST') {
-    const { nombre, fecha, cierre_auto, folder_id, portada, estado, moderacion } = await request.json();
-    if (!nombre || !fecha || !folder_id) return json({ error: 'Faltan campos obligatorios' }, 400);
+    const { nombre, fecha, cierre_auto, folder_id, portada, estado, moderacion, storage } = await request.json();
+    if (!nombre || !fecha) return json({ error: 'Faltan campos obligatorios' }, 400);
+    const storageVal = (storage === 'r2' || storage === 'drive') ? storage : 'drive';
+    if (storageVal === 'drive' && !folder_id) return json({ error: 'folder_id requerido para Drive' }, 400);
     const id = generateEventId();
     const slug = makeEventSlug(nombre, fecha);
     await env.DB.prepare(`
-      INSERT INTO eventos_foto (id, nombre, fecha, cierre_auto, folder_id, portada, estado, moderacion, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind(id, nombre, fecha, cierre_auto || null, folder_id, portada || null,
-        estado || 'activo', moderacion ? 1 : 0, nowISO()).run();
+      INSERT INTO eventos_foto (id, nombre, fecha, cierre_auto, folder_id, portada, estado, moderacion, storage, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(id, nombre, fecha, cierre_auto || null, folder_id || '', portada || null,
+        estado || 'activo', moderacion ? 1 : 0, storageVal, nowISO()).run();
     await env.KV.put('fiesta_slug_' + slug, id);
     return json({ ok: true, id, slug });
   }
 
   if (path === '/eventos/admin/config' && method === 'GET') {
-    const gas_url = await env.KV.get('fiestas_gas_url');
-    return json({ gas_url: gas_url || '' });
+    const [gas_url, storage] = await Promise.all([
+      env.KV.get('fiestas_gas_url'),
+      env.KV.get('fiestas_storage')
+    ]);
+    return json({ gas_url: gas_url || '', storage: storage || 'drive' });
   }
 
   if (path === '/eventos/admin/config' && method === 'POST') {
-    const { gas_url } = await request.json();
-    if (!gas_url) return json({ error: 'gas_url requerido' }, 400);
-    await env.KV.put('fiestas_gas_url', gas_url);
+    const { gas_url, storage } = await request.json();
+    const ops = [];
+    if (gas_url !== undefined) ops.push(env.KV.put('fiestas_gas_url', gas_url));
+    if (storage === 'r2' || storage === 'drive') ops.push(env.KV.put('fiestas_storage', storage));
+    if (!ops.length) return json({ error: 'Nada que actualizar' }, 400);
+    await Promise.all(ops);
     return json({ ok: true });
   }
 
