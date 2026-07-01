@@ -14,7 +14,7 @@ export async function handleEventosAdmin(path, method, request, env) {
   if (path === '/eventos/admin' && method === 'POST') {
     const { nombre, fecha, cierre_auto, folder_id, portada, estado, moderacion, storage } = await request.json();
     if (!nombre || !fecha) return json({ error: 'Faltan campos obligatorios' }, 400);
-    const storageVal = (storage === 'r2' || storage === 'drive') ? storage : 'drive';
+    const storageVal = (storage === 'r2' || storage === 'drive') ? storage : 'r2';
     if (storageVal === 'drive' && !folder_id) return json({ error: 'folder_id requerido para Drive' }, 400);
     const id = generateEventId();
     const slug = makeEventSlug(nombre, fecha);
