@@ -8335,6 +8335,7 @@ function ctExtra() {
   const o = {};
   if (c.systemSheetId)  o.systemSheetId  = c.systemSheetId;
   if (c.presupuestosId) o.presupuestosId = c.presupuestosId;
+  if (c.calendarId)     o.calendarId     = c.calendarId;
   return o;
 }
 
@@ -9844,7 +9845,7 @@ function calSyncEvento(ev) {
     fecha: ev.fecha, hora: ev.hora || '09:00',
     tipo: ev.tipo, nombre: ev.nombre, lugar: ev.lugar || ''
   };
-  _jsonp(url + '?action=syncCalendar&events=' + encodeURIComponent(JSON.stringify([payload])))
+  _jsonp(url + '?action=syncCalendar&events=' + encodeURIComponent(JSON.stringify([payload])) + ctExtraParams())
     .catch(function(){});
 }
 
@@ -9860,7 +9861,7 @@ async function calSyncGAS() {
       fecha: ev.fecha, hora: ev.hora || '09:00',
       tipo: ev.tipo, nombre: ev.nombre, lugar: ev.lugar || ''
     }; });
-    const res = await _jsonp(url + '?action=syncCalendar&events=' + encodeURIComponent(JSON.stringify(eventos)));
+    const res = await _jsonp(url + '?action=syncCalendar&events=' + encodeURIComponent(JSON.stringify(eventos)) + ctExtraParams());
     if (res.ok) toast('Sincronizado: ' + res.synced + ' eventos en Google Calendar ✓');
     else toast(res.error || 'Error al sincronizar', 'error');
   } catch(e) { toast('Error: ' + e.message, 'error'); }
