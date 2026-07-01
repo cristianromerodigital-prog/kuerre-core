@@ -1,6 +1,7 @@
 {
   "outputs": [
-    "WEB CRP/Productivo/admin.html"
+    "WEB CRP/Productivo/admin.html",
+    "WEB CRP/Desarrollo/admin.html"
   ],
   "patches": [
     {
