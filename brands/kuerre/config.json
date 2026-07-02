@@ -7,8 +7,8 @@
   "patches": [
     {
       "_comment": "1. Version KUERRE",
-      "find": ">V1.86<",
-      "replace": ">V1.53<"
+      "find": ">V1.87<",
+      "replace": ">V1.54<"
     },
     {
       "_comment": "2. CSS override KUERRE",

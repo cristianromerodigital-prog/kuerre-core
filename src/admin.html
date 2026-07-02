@@ -394,7 +394,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
         <span class="sidebar-user">Admin</span>
         <button class="logout-btn" onclick="doLogout()">Salir</button>
       </div>
-      <div style="font-size:10px;color:var(--gray2);margin-top:8px;text-align:center;">V1.86</div>
+      <div style="font-size:10px;color:var(--gray2);margin-top:8px;text-align:center;">V1.87</div>
     </div>
   </aside>
 
@@ -10149,8 +10149,10 @@ async function calSyncGAS() {
 
 // ── AGENDAR DESDE CALENDARIO ──
 function calAbrirAgendar(fechaStr) {
-  document.getElementById('cal-ag-fecha').value = fechaStr || '';
-  document.getElementById('cal-ag-hora').value = '';
+  const ahora = new Date();
+  if (!fechaStr) fechaStr = _calDiaSel || (ahora.getFullYear() + '-' + String(ahora.getMonth()+1).padStart(2,'0') + '-' + String(ahora.getDate()).padStart(2,'0'));
+  document.getElementById('cal-ag-fecha').value = fechaStr;
+  document.getElementById('cal-ag-hora').value = String(ahora.getHours()).padStart(2,'0') + ':' + String(ahora.getMinutes()).padStart(2,'0');
   document.getElementById('cal-ag-lugar').value = '';
   document.getElementById('cal-ag-buscar').value = '';
   document.getElementById('cal-ag-cliente-id').value = '';
