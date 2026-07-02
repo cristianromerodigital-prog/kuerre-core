@@ -5,9 +5,11 @@ import { isAdmin } from './auth.js';
 
 export async function handleEventosAdmin(path, method, request, env) {
   if ((path === '/eventos/admin/list' || path === '/eventos/admin') && method === 'GET') {
-    const { results } = await env.DB.prepare(
-      'SELECT * FROM eventos_foto ORDER BY fecha DESC'
-    ).all();
+    const { results } = await env.DB.prepare(`
+      SELECT ef.*, e.nombre, e.fecha
+      FROM eventos_foto ef LEFT JOIN eventos e ON e.id = ef.evento_id
+      ORDER BY e.fecha DESC
+    `).all();
     return json({ eventos: results });
   }
 
@@ -18,11 +20,17 @@ export async function handleEventosAdmin(path, method, request, env) {
     if (storageVal === 'drive' && !folder_id) return json({ error: 'folder_id requerido para Drive' }, 400);
     const id = generateEventId();
     const slug = makeEventSlug(nombre, fecha);
+    // nombre/fecha viven en la tabla central eventos (hub) — crear o linkear por slug
     await env.DB.prepare(`
-      INSERT INTO eventos_foto (id, nombre, fecha, cierre_auto, folder_id, portada, estado, moderacion, storage, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind(id, nombre, fecha, cierre_auto || null, folder_id || '', portada || null,
-        estado || 'activo', moderacion ? 1 : 0, storageVal, nowISO()).run();
+      INSERT INTO eventos (slug, nombre, fecha, qr) VALUES (?, ?, ?, 1)
+      ON CONFLICT(slug) DO UPDATE SET qr=1
+    `).bind(slug, nombre, fecha).run();
+    const hubEvento = await env.DB.prepare('SELECT id FROM eventos WHERE slug=?').bind(slug).first();
+    await env.DB.prepare(`
+      INSERT INTO eventos_foto (id, cierre_auto, folder_id, portada, estado, moderacion, storage, evento_id, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(id, cierre_auto || null, folder_id || '', portada || null,
+        estado || 'activo', moderacion ? 1 : 0, storageVal, hubEvento.id, nowISO()).run();
     await env.KV.put('fiesta_slug_' + slug, id);
     return json({ ok: true, id, slug });
   }
@@ -50,16 +58,30 @@ export async function handleEventosAdmin(path, method, request, env) {
     const id = putMatch[1];
     const body = await request.json();
     const fields = [], vals = [];
-    const allowed = ['nombre', 'fecha', 'cierre_auto', 'folder_id', 'portada', 'estado', 'moderacion'];
+    const allowed = ['cierre_auto', 'folder_id', 'portada', 'estado', 'moderacion'];
     for (const k of allowed) {
       if (body[k] !== undefined) {
         fields.push(`${k} = ?`);
         vals.push(k === 'moderacion' ? (body[k] ? 1 : 0) : (body[k] || null));
       }
     }
-    if (!fields.length) return json({ error: 'Nada que actualizar' }, 400);
-    vals.push(id);
-    await env.DB.prepare(`UPDATE eventos_foto SET ${fields.join(', ')} WHERE id = ?`).bind(...vals).run();
+    const tocaHub = body.nombre !== undefined || body.fecha !== undefined;
+    if (!fields.length && !tocaHub) return json({ error: 'Nada que actualizar' }, 400);
+    if (fields.length) {
+      await env.DB.prepare(`UPDATE eventos_foto SET ${fields.join(', ')} WHERE id = ?`).bind(...vals, id).run();
+    }
+    // nombre/fecha viven en la tabla central eventos (hub)
+    if (tocaHub) {
+      const row = await env.DB.prepare('SELECT evento_id FROM eventos_foto WHERE id = ?').bind(id).first();
+      if (row?.evento_id) {
+        const hubFields = [], hubVals = [];
+        if (body.nombre !== undefined && body.nombre) { hubFields.push('nombre = ?'); hubVals.push(body.nombre); }
+        if (body.fecha  !== undefined && body.fecha)  { hubFields.push('fecha = ?');  hubVals.push(body.fecha); }
+        if (hubFields.length) {
+          await env.DB.prepare(`UPDATE eventos SET ${hubFields.join(', ')} WHERE id = ?`).bind(...hubVals, row.evento_id).run();
+        }
+      }
+    }
     return json({ ok: true });
   }
 
@@ -137,9 +159,11 @@ export async function handleEventosAdmin(path, method, request, env) {
 // ─── Público ─────────────────────────────────────────────────────────────────
 
 export async function handleEventoPublico(id, env) {
-  const evento = await env.DB.prepare(
-    'SELECT id, nombre, fecha, portada, estado, moderacion, cierre_auto FROM eventos_foto WHERE id = ?'
-  ).bind(id).first();
+  const evento = await env.DB.prepare(`
+    SELECT ef.id, e.nombre, e.fecha, ef.portada, ef.estado, ef.moderacion, ef.cierre_auto
+    FROM eventos_foto ef LEFT JOIN eventos e ON e.id = ef.evento_id
+    WHERE ef.id = ?
+  `).bind(id).first();
   if (!evento) return json({ error: 'Evento no encontrado' }, 404);
   return json(evento);
 }
