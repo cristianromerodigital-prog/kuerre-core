@@ -6,9 +6,9 @@
   "contentSection": "content-section.html",
   "patches": [
     {
-      "_comment": "1. Version — misma que CORE (V1.50)",
+      "_comment": "1. Version KUERRE",
       "find": ">V1.83<",
-      "replace": ">V1.83<"
+      "replace": ">V1.51<"
     },
     {
       "_comment": "2. CSS override KUERRE",
@@ -100,6 +100,11 @@
       "_comment": "19. Video section agregar boton Drive",
       "find": "                  <input class=\"form-input\" id=\"video-url-input\" placeholder=\"https://res.cloudinary.com/... o cualquier URL directa de .mp4\" oninput=\"previewVideoUrl(this.value)\">\n                  <p id=\"video-url-hint\" style=\"font-size:11px;color:var(--gray);margin-top:8px;line-height:1.7;letter-spacing:0.5px\">Pegá una URL directa de .mp4 o .webm</p>",
       "replace": "                  <div style=\"display:flex;gap:8px\">\n                    <input class=\"form-input\" id=\"video-url-input\" placeholder=\"URL directa .mp4 o ID de Drive...\" style=\"flex:1\" oninput=\"previewVideoUrl(this.value)\">\n                    <button class=\"btn-sm\" onclick=\"pickVideoDrive()\">Drive</button>\n                  </div>\n                  <p id=\"video-url-hint\" style=\"font-size:11px;color:var(--gray);margin-top:8px;line-height:1.7;letter-spacing:0.5px\">Pegá una URL .mp4 o seleccioná desde Drive</p>"
+    },
+    {
+      "_comment": "20. CT_USE_D1 = true para KUERRE (contratos en D1)",
+      "find": "const CT_USE_D1  = false; // CRP override: true (uses CLIENTES_WORKER /contratos)",
+      "replace": "const CT_USE_D1  = true;"
     }
   ]
 }

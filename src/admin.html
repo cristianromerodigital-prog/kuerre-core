@@ -8853,6 +8853,7 @@ async function ctGenerar() {
           headers: { 'Authorization': 'Bearer ' + getAdminJWT(), 'Content-Type': 'application/json' },
           body: JSON.stringify({
             numero:          json.numero,
+            fecha_evento:    _isBoda ? (data.fiesta?.fecha || '') : (data.evento?.fecha || ''),
             cliente:         _isBoda ? (data.novia?.nombre || '') : (data.cliente?.nombre || ''),
             cliente2:        _isBoda ? (data.novio?.nombre || '') : data.tipo === 'XV' ? (data.quinceanera?.nombre || '') : '',
             lugar:           _isBoda ? (data.fiesta?.lugar || '') : (data.evento?.salon || ''),
