@@ -9,7 +9,7 @@
       "_comment": "1. Version KUERRE (regex para no romper cuando CORE bumpea)",
       "regex": ">V1\\.\\d+<",
       "flags": "g",
-      "replace": ">V1.54<"
+      "replace": ">V1.55<"
     },
     {
       "_comment": "2. CSS override KUERRE",
