@@ -9,7 +9,12 @@
       "_comment": "1. Version KUERRE (regex para no romper cuando CORE bumpea)",
       "regex": ">V1\\.\\d+<",
       "flags": "g",
-      "replace": ">V1.55<"
+      "replace": ">V1.56<"
+    },
+    {
+      "_comment": "1b. Ocultar boton sync GCal (kuerre no tiene Google Calendar configurado)",
+      "find": "<button class=\"btn-sm btn-sec\" onclick=\"calSyncGAS()\" id=\"cal-btn-sync\">Sincronizar con Google Calendar</button>",
+      "replace": ""
     },
     {
       "_comment": "2. CSS override KUERRE",
