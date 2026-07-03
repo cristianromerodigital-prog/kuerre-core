@@ -997,6 +997,27 @@ tr:hover td{background:rgba(255,255,255,0.02);}
                   <input type="checkbox" id="inv-estilo-aero" style="accent-color:var(--gold);width:15px;height:15px">
                   <label for="inv-estilo-aero" style="font-size:12px;color:var(--gray2);cursor:pointer">Efecto Aero (glassmorphism)</label>
                 </div>
+                <div class="form-group">
+                  <label class="form-label">Formato de portada</label>
+                  <select class="form-input" id="inv-formato" onchange="invFormatoChange()">
+                    <option value="clasico">Clásica</option>
+                    <option value="wedding">Wedding</option>
+                  </select>
+                </div>
+              </div>
+              <div class="inv-form-2col" id="inv-wedding-opts" style="display:none;margin-top:16px">
+                <div class="form-group">
+                  <label class="form-label">Texto script (portada)</label>
+                  <input type="text" class="form-input" id="inv-wedding-script" placeholder="The Wedding">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Efecto de separación texto/foto</label>
+                  <select class="form-input" id="inv-wedding-fx">
+                    <option value="glow">Glow suave + sombra</option>
+                    <option value="blur">Aero / blur detrás</option>
+                    <option value="sombra">Solo sombra oscura</option>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -6404,6 +6425,10 @@ function openInviteModal(id) {
     document.getElementById('inv-env-particulas-tam-val').textContent = tam;
     document.getElementById('inv-color-esquema').value = c.color_esquema || 'negro';
     document.getElementById('inv-estilo-aero').checked = !!c.estilo_aero;
+    document.getElementById('inv-formato').value = c.formato || 'clasico';
+    document.getElementById('inv-wedding-script').value = c.wedding_script || '';
+    document.getElementById('inv-wedding-fx').value = c.wedding_fx || 'glow';
+    invFormatoChange();
     const slugEl = document.getElementById('inv-slug');
     slugEl.value = inv.slug || '';
     slugEl.dataset.manual = inv.slug ? '1' : '';
@@ -6438,6 +6463,10 @@ function openInviteModal(id) {
     document.getElementById('inv-tipo').value = 'casamiento';
     document.getElementById('inv-color-esquema').value = 'negro';
     document.getElementById('inv-estilo-aero').checked = false;
+    document.getElementById('inv-formato').value = 'clasico';
+    document.getElementById('inv-wedding-script').value = '';
+    document.getElementById('inv-wedding-fx').value = 'glow';
+    invFormatoChange();
     setHeroTextPos(0, 0);
     ['inv-media-preview-img','inv-media-preview-vid'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
     invTipoChange();
@@ -6497,6 +6526,9 @@ function readInviteForm() {
       env_particulas_tam: parseInt(document.getElementById('inv-env-particulas-tam').value),
       color_esquema: document.getElementById('inv-color-esquema').value,
       estilo_aero: document.getElementById('inv-estilo-aero').checked,
+      formato: document.getElementById('inv-formato').value,
+      wedding_script: document.getElementById('inv-wedding-script').value.trim(),
+      wedding_fx: document.getElementById('inv-wedding-fx').value,
       logo_dark: S.get('crd_site_logo') || '',
       logo_light: S.get('crd_site_logo') || '',
       logo_filter: S.get('crd_site_logo_filter') || '',
@@ -6785,6 +6817,11 @@ function invTipoChange() {
   document.getElementById('inv-recepcion-lugar-wrap').style.display = esBoda ? '' : 'none';
   document.getElementById('inv-lugar-hint').style.display = esBoda ? 'none' : 'block';
   document.getElementById('inv-recepcion-hora-label').textContent = esBoda ? 'Horario — Recepción / Fiesta' : 'Horario del evento';
+}
+
+function invFormatoChange() {
+  const wedding = document.getElementById('inv-formato').value === 'wedding';
+  document.getElementById('inv-wedding-opts').style.display = wedding ? '' : 'none';
 }
 
 function invPreviewMedia(url, type) {
