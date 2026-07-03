@@ -717,8 +717,8 @@ tr:hover td{background:rgba(255,255,255,0.02);}
             <!-- POSICIÓN TEXTO PORTADA -->
             <div class="inv-modal-section">
               <div class="inv-modal-section-title">Posición del Texto en Portada</div>
-              <div style="font-size:11px;color:var(--gray2);margin-bottom:10px;line-height:1.6">Arrastrá los textos para reposicionarlos y reordenarlos (arriba/medio/abajo). Rueda del mouse sobre un texto = ajuste fino.</div>
-              <iframe id="inv-hero-preview" style="width:240px;max-width:100%;height:427px;border:1px solid var(--border);border-radius:8px;background:#000;display:block"></iframe>
+              <div style="font-size:11px;color:var(--gray2);margin-bottom:10px;line-height:1.6">Ajustá dónde va cada texto sobre la foto o video de portada.</div>
+              <button type="button" class="btn-sm" onclick="openHeroPopup()">✎ Editar posición</button>
             </div>
 
             <!-- HORARIOS -->
@@ -1009,6 +1009,22 @@ tr:hover td{background:rgba(255,255,255,0.02);}
             <div style="display:flex;gap:10px">
               <button class="btn-sm" onclick="saveAndPreviewInvite()">Guardar y previsualizar</button>
               <button class="btn-add" onclick="saveInvite()">Guardar invitación</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HERO POSITION POPUP -->
+      <div class="modal-bg" id="inv-hero-popup" style="z-index:600">
+        <div class="modal" style="max-width:460px;width:auto;background:var(--black2)">
+          <div class="modal-header">
+            <span>Posición del Texto en Portada</span>
+            <button class="modal-close" onclick="closeHeroPopup()">✕</button>
+          </div>
+          <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;align-items:center">
+            <div style="font-size:11px;color:var(--gray2);margin-bottom:14px;line-height:1.6;text-align:center;max-width:340px">Arrastrá los textos para reposicionarlos y reordenarlos (arriba/medio/abajo). Rueda del mouse sobre un texto = ajuste fino.</div>
+            <div id="inv-hero-popup-frame-wrap" style="overflow:hidden;border:1px solid var(--border);border-radius:8px;background:#000">
+              <iframe id="inv-hero-preview" style="width:390px;height:844px;border:0;display:block;transform-origin:0 0"></iframe>
             </div>
           </div>
         </div>
@@ -6584,25 +6600,29 @@ function saveInvite() {
   const data = readInviteForm();
   if (!data.config.novios && !data.config.titulo) { toast('Ingresá al menos un nombre o título'); return; }
   const list = getInvites();
+  let savedId;
   if (invEditingId) {
+    savedId = invEditingId;
     const idx = list.findIndex(i => i.id === invEditingId);
     if (idx !== -1) { list[idx].tipo = data.tipo; list[idx].config = data.config; list[idx].slug = data.slug; }
   } else {
-    const newId = 'inv_' + Date.now();
-    list.unshift({ id: newId, tipo: data.tipo, config: data.config, slug: data.slug, created: new Date().toISOString() });
+    savedId = 'inv_' + Date.now();
+    list.unshift({ id: savedId, tipo: data.tipo, config: data.config, slug: data.slug, created: new Date().toISOString() });
     if (_invClienteId) {
       const cid = _invClienteId;
       fetch(CLIENTES_WORKER + '/solicitudes/' + cid + '/invite', {
         method: 'PATCH',
         headers: { 'Authorization': 'Bearer ' + getAdminJWT(), 'Content-Type': 'application/json' },
-        body: JSON.stringify({ invite_id: newId })
+        body: JSON.stringify({ invite_id: savedId })
       }).then(function() {
         const idx = _clientes.findIndex(function(x){ return x.id === cid; });
-        if (idx !== -1) _clientes[idx].invite_id = newId;
+        if (idx !== -1) _clientes[idx].invite_id = savedId;
       }).catch(function(){});
     }
   }
   saveInvites(list);
+  const inv = list.find(i => i.id === savedId);
+  if (inv) genInviteUrl(inv);
   closeInviteModal();
   renderInvitesPage();
   toast('Invitación guardada ✓');
@@ -6863,6 +6883,34 @@ function initHeroPreviewIframe() {
   };
   iframe.src = getInvBaseUrl() + '?preview=1&_=' + Date.now();
 }
+
+const HERO_POPUP_NATIVE_W = 390;
+const HERO_POPUP_NATIVE_H = 844;
+
+function openHeroPopup() {
+  document.getElementById('inv-hero-popup').classList.add('open');
+  scaleHeroPopupFrame();
+  refreshHeroPreview();
+}
+
+function closeHeroPopup() {
+  document.getElementById('inv-hero-popup').classList.remove('open');
+}
+
+function scaleHeroPopupFrame() {
+  const wrap = document.getElementById('inv-hero-popup-frame-wrap');
+  const iframe = document.getElementById('inv-hero-preview');
+  const maxW = Math.min(HERO_POPUP_NATIVE_W, window.innerWidth - 80);
+  const maxH = window.innerHeight - 260;
+  const scale = Math.min(maxW / HERO_POPUP_NATIVE_W, maxH / HERO_POPUP_NATIVE_H, 1);
+  iframe.style.transform = `scale(${scale})`;
+  wrap.style.width = (HERO_POPUP_NATIVE_W * scale) + 'px';
+  wrap.style.height = (HERO_POPUP_NATIVE_H * scale) + 'px';
+}
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('inv-hero-popup').classList.contains('open')) scaleHeroPopupFrame();
+});
 
 function invPreviewMedia(url, type) {
   const t = type || document.getElementById('inv-media-type').value;

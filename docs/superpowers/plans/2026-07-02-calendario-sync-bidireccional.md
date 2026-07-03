@@ -718,3 +718,40 @@ Actualizar memoria: nota en `project_crp_drive_clientes` o memoria nueva sobre e
 - `hora_inicio` de evento NO se actualiza desde GCal (solo fecha) — decisión: es dato contractual.
 - Si el usuario mueve un evento del sistema en GCal Y en el admin entre ciclos, gana el último escrito.
 - KUERRE queda con UI vieja hasta replicar endpoints (anotado en memoria, Task 5).
+
+---
+
+## Pendiente — replicar en KUERRE (no ejecutado en esta pasada)
+
+**Estado del frontend (CORE):** ya está listo y compartido — `calEliminar`, las notas 📌, `calSyncGAS` apuntando a `/calendario/sync`, y el bump de versión ya viven en `CORE/src/admin.html` y se aplican a KUERRE también en cuanto se buildee (`brands/kuerre/config.json` ya tiene el patch de versión en `V1.55`, commiteado). **No hace falta tocar CORE de nuevo** — el trabajo que falta es 100% en `WEB KUERRE/worker` y su GAS.
+
+**Bloqueante:** `node build-admin.cjs kuerre` (o `all`) NO debe correrse hasta terminar los 3 pasos de abajo — el admin generado llamaría a endpoints que el worker de KUERRE todavía no tiene.
+
+### 1. Tablas D1 en kuerre-db
+Mismo DDL que Task 1 de este plan, pero contra la base de KUERRE:
+```bash
+cd "e:/CLAUDE/WEB KUERRE/worker"
+npx wrangler d1 execute kuerre-db --remote --command "CREATE TABLE IF NOT EXISTS gcal_map (solicitud_id TEXT NOT NULL, tipo TEXT NOT NULL, gcal_id TEXT NOT NULL, PRIMARY KEY (solicitud_id, tipo)); CREATE TABLE IF NOT EXISTS agenda (id INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT NOT NULL, fecha TEXT NOT NULL, hora TEXT DEFAULT '', lugar TEXT DEFAULT '', gcal_id TEXT UNIQUE, created_at TEXT NOT NULL DEFAULT (datetime('now')));"
+```
+Agregar el mismo bloque a `WEB KUERRE/worker/schema.sql`.
+
+### 2. Módulo de sync en `WEB KUERRE/worker/src/index.js` — ⚠️ el modelo de datos NO es igual al de CRP
+No copiar `getSystemCalEvents`/`clearSystemDate`/`setSystemDate` tal cual desde el worker CRP. Diferencias confirmadas en `WEB KUERRE/worker/schema.sql`:
+- La tabla `solicitudes` de KUERRE **no tiene** columnas `civil_fecha/civil_hora/civil_dir` ni `reli_fecha/reli_hora/reli_dir` — esos datos viven dentro de `data_json.civil` / `data_json.religiosa` (ver el bloque `agendarMatch` ya existente en `WEB KUERRE/worker/src/index.js` línea ~838, que hace `JSON.parse(row?.data_json)` y mergea).
+- `book_fecha/book_hora/book_zona` y `hora_inicio` tampoco están en `schema.sql` — si el worker ya los usa (el PATCH de book sí los reference), confirmar con `PRAGMA table_info(solicitudes)` contra kuerre-db remoto antes de escribir el SELECT, no asumir que existen.
+- La tabla `eventos` sí es equivalente a la de CRP (`id, slug, nombre, fecha, tipo, ...`), así que el patrón `evento_id → eventos.fecha` para el tipo `evento` se traslada igual.
+
+Replicar el resto del módulo (`gasCfg`, `gasPost`, `gcalPushUpsert`, `gasDeleteEvent`, `calendarFullSync`, los endpoints `PATCH/DELETE /solicitudes/:id/agendar`, `GET /agenda`, `DELETE /agenda/:id`, `POST /calendario/sync`, y el cron `% 10 === 0`) con la misma lógica de Task 2, adaptando el `SELECT` interno de `getSystemCalEvents` al esquema real verificado.
+
+### 3. Acciones en el GAS de KUERRE
+KUERRE tiene su **propio** deployment/cuenta de Apps Script (no reutilizar el `AKfycbzBVU7...` de CRP — es otro Script ID, ver `project_kuerre_gas` en memoria). Portar las mismas 3 funciones de `SheetService.gs` (`fullSyncCalendar`, `upsertCalendarEvent`, `deleteCalendarEvent`, con el fix de comparación exacta de título — no usar `{search:}`) y el dispatch en `Code.gs`. Deployar con `clasp login` a la cuenta correcta (kuerre, no `cristian.romero.digital@gmail.com`) y `clasp deploy -i <deploymentId de KUERRE>`. Probar con `curl` antes de dar por bueno (misma regla que CRP).
+
+### 4. Build + deploy
+```bash
+cd "e:/CLAUDE/CORE" && node build-admin.cjs kuerre
+cd "e:/CLAUDE/WEB KUERRE/worker" && npx wrangler deploy
+```
+Luego el flujo de deploy habitual de KUERRE (gh-pages worktree + push, ver `project_kuerre_web` en memoria).
+
+### 5. E2E
+Mismo checklist de la Task 5 de este plan, contra el admin de KUERRE.
