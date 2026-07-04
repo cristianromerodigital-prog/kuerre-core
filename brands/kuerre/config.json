@@ -9,7 +9,7 @@
       "_comment": "1. Version KUERRE (regex para no romper cuando CORE bumpea)",
       "regex": ">V1\\.\\d+<",
       "flags": "g",
-      "replace": ">V1.58<"
+      "replace": ">V1.59<"
     },
     {
       "_comment": "1b. Ocultar boton sync GCal (kuerre no tiene Google Calendar configurado)",
