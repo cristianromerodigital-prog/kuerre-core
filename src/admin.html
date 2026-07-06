@@ -4118,7 +4118,13 @@ function showPage(id) {
   if (id === 'dashboard') renderDashboard();
   if (id === 'photos') renderPhotosPage();
   if (id === 'video') loadVideoPage();
-  if (id === 'content') { loadContentPage(); setTimeout(loadDestinations, 100); }
+  if (id === 'content') {
+    fetchFromCloud('crd_content').then(cloud => {
+      if (cloud && typeof cloud === 'object') localStorage.setItem('crd_content', JSON.stringify(cloud));
+      loadContentPage();
+    });
+    setTimeout(loadDestinations, 100);
+  }
   if (id === 'invites') renderInvitesPage();
   if (id === 'fiestas') loadFiestasPage();
   if (id === 'calendario') loadCalendarioPage();

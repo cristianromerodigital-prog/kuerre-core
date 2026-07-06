@@ -9,7 +9,7 @@
       "_comment": "1. Version KUERRE (regex para no romper cuando CORE bumpea)",
       "regex": ">V1\\.\\d+<",
       "flags": "g",
-      "replace": ">V1.62<"
+      "replace": ">V1.63<"
     },
     {
       "_comment": "1b. Ocultar boton sync GCal (kuerre no tiene Google Calendar configurado)",
@@ -81,11 +81,6 @@
       "_comment": "14. init() inline sin loadModules",
       "find": "      init();\n      loadModules();",
       "replace": "      init();"
-    },
-    {
-      "_comment": "15. showPage content usa initContentIfEmpty",
-      "find": "if (id === 'content') { loadContentPage(); setTimeout(loadDestinations, 100); }",
-      "replace": "if (id === 'content') { initContentIfEmpty(); loadContentPage(); }"
     },
     {
       "_comment": "16. init() agregar localStorage.removeItem antes de _fetchClientes",
