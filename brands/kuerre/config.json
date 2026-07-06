@@ -9,7 +9,7 @@
       "_comment": "1. Version KUERRE (regex para no romper cuando CORE bumpea)",
       "regex": ">V1\\.\\d+<",
       "flags": "g",
-      "replace": ">V1.65<"
+      "replace": ">V1.66<"
     },
     {
       "_comment": "1b. Ocultar boton sync GCal (kuerre no tiene Google Calendar configurado)",
@@ -186,6 +186,11 @@
       "_comment": "36. renderInvitesPage: url de la card usa base social si modelo=social (ver patch 30)",
       "find": "const slug = nombre + (fecha ? '-' + fecha : '') + '-' + suffix;\n    const base = getInvBaseUrl();\n    const url = base + '?i=' + slug;",
       "replace": "const slug = nombre + (fecha ? '-' + fecha : '') + '-' + suffix;\n    const base = inv.config.modelo === 'social' ? getInvSocialBaseUrl() : getInvBaseUrl();\n    const url = base + '?i=' + slug;"
+    },
+    {
+      "_comment": "37. cmCrearCarpetas envia driveRoot propio de Kuerre (carpeta raiz separada de CRP)",
+      "find": "body: JSON.stringify({ codigoContrato: codigo })",
+      "replace": "body: JSON.stringify({ codigoContrato: codigo, driveRoot: '1te7B-sW6T-OzZepaUQe8kD2SiIdQsEzb' })"
     }
   ]
 }
