@@ -1,6 +1,6 @@
 // build-admin.js
-// Uso: node build-admin.js [kuerre|crp|all]
-// Genera Productivo/admin.html de cada marca desde CORE/src/admin.html
+// Uso: node build-admin.js [kuerre|crp|all] [all|dev|prod]
+// Genera admin.html de cada marca desde CORE/src/admin.html
 // Sin dependencias npm — solo fs y path built-in
 
 const fs   = require('fs');
@@ -35,7 +35,14 @@ function applyContentSection(html, brandDir, sectionFile) {
   return html.slice(0, startIdx) + content + html.slice(endIdx);
 }
 
-function buildBrand(brandName) {
+function shouldWriteOutput(outRel, outputTarget) {
+  const normalized = outRel.replace(/\\/g, '/').toLowerCase();
+  if (outputTarget === 'dev') return normalized.includes('/desarrollo/');
+  if (outputTarget === 'prod') return normalized.includes('/productivo/');
+  return true;
+}
+
+function buildBrand(brandName, outputTarget) {
   const brandDir = path.join(ROOT, 'brands', brandName);
   const config   = JSON.parse(fs.readFileSync(path.join(brandDir, 'config.json'), 'utf8'));
 
@@ -51,23 +58,31 @@ function buildBrand(brandName) {
   }
 
   // 3. Write outputs
-  for (const outRel of config.outputs) {
+  const outputs = config.outputs.filter(outRel => shouldWriteOutput(outRel, outputTarget));
+  if (!outputs.length) throw new Error(`[${brandName}] No outputs for target "${outputTarget}"`);
+
+  for (const outRel of outputs) {
     const outPath = path.resolve(ROOT, '..', outRel);
     fs.mkdirSync(path.dirname(outPath), { recursive: true });
     fs.writeFileSync(outPath, html, 'utf8');
     console.log(`  → ${outRel}`);
   }
 
-  console.log(`✅ ${brandName} built (${config.outputs.length} file${config.outputs.length !== 1 ? 's' : ''})`);
+  console.log(`✅ ${brandName} built (${outputs.length} file${outputs.length !== 1 ? 's' : ''}, target: ${outputTarget})`);
 }
 
 // Entry point
 const target = process.argv[2] || 'all';
+const outputTarget = process.argv[3] || 'all';
+if (!['all', 'dev', 'prod'].includes(outputTarget)) {
+  console.error(`❌ Invalid output target "${outputTarget}". Use all, dev, or prod.`);
+  process.exit(1);
+}
 const brands = target === 'all' ? ['kuerre', 'crp'] : [target];
 
 for (const brand of brands) {
   try {
-    buildBrand(brand);
+    buildBrand(brand, outputTarget);
   } catch(e) {
     console.error(`❌ ${brand}: ${e.message}`);
     process.exit(1);
