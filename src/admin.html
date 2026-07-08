@@ -6783,7 +6783,7 @@ function openInvDriveBrowser() {
     } catch (e) {
       toast('Error descargando el video de Drive', 'error');
     }
-  });
+  }, invClienteFolder('drive_invitacion_id'));
 }
 
 async function openInvBrowser() {
@@ -7552,13 +7552,22 @@ let _dbCurrent = '';
 let pendingPhotoCallback = null;
 const _dbSelected = new Map();
 
-function openDriveBrowser(callback) {
+function openDriveBrowser(callback, startFolder) {
   if(callback) pendingPhotoCallback = callback;
   _dbSelected.clear();
   dbUpdateSelectionBar();
   document.getElementById('drive-browser-modal').style.display = 'block';
+  if (startFolder) { document.getElementById('db-folder-input').value = startFolder; dbLoadFolder(startFolder); return; }
   const last = localStorage.getItem('crd_last_drive_folder');
   if(last && !_dbCurrent) { document.getElementById('db-folder-input').value = last; dbLoadFolder(last); }
+}
+
+// [COMPARTIDA] Carpeta de Drive del cliente vinculado a la invitación en edición
+// (solicitudes.invite_id === invEditingId). null si la invitación no tiene cliente.
+function invClienteFolder(field) {
+  if (!invEditingId || !Array.isArray(_clientes)) return null;
+  const s = _clientes.find(c => c && c.invite_id === invEditingId);
+  return (s && s[field]) || null;
 }
 function closeDriveBrowser() {
   _dbSelected.clear();
