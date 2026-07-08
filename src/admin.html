@@ -9644,7 +9644,7 @@ async function ctGenerar() {
             body: JSON.stringify(payload)
           }).then(function(r){ return r.json(); }).then(function(d){
             if (d.ok) {
-              patchContrato(d.id, false);
+              patchContrato(d.id, true);
             }
           }).catch(function(){});
         }
