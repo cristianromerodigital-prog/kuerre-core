@@ -4129,8 +4129,26 @@ function cmSaveContrato() {
   }).catch(function(){});
 }
 
+// [COMPARTIDA] Invitación vinculada al cliente actual (solicitudes.invite_id), null si no hay.
+function cmLinkedInvite() {
+  if (!_clienteActual || !_clienteActual.invite_id) return null;
+  return getInvites().find(function(i){ return i && i.id === _clienteActual.invite_id; }) || null;
+}
+
 function cmGoInvite() {
-  if (_clienteActual) { _pendingClienteId = _clienteActual.id; _invClienteId = _clienteActual.id; }
+  if (_clienteActual) {
+    _invClienteId = _clienteActual.id;
+    // Si ya existe la invitación vinculada, editarla en lugar de crear otra
+    const linked = cmLinkedInvite();
+    if (linked) {
+      const lid = linked.id;
+      document.getElementById('cliente-modal').style.display = 'none';
+      showPage('invites');
+      setTimeout(function(){ openInviteModal(lid); }, 150);
+      return;
+    }
+    _pendingClienteId = _clienteActual.id;
+  }
   document.getElementById('cliente-modal').style.display = 'none';
   showPage('invites');
 }
@@ -4159,11 +4177,22 @@ function cmGetInviteUrl() {
 }
 
 function cmOpenInvite() {
+  const linked = cmLinkedInvite();
+  if (linked) { genInviteUrl(linked).then(function(url){ window.open(url, '_blank'); }); return; }
   const url = cmGetInviteUrl();
   if (url) window.open(url, '_blank');
 }
 
 function cmCopyInvite() {
+  const linked = cmLinkedInvite();
+  if (linked) {
+    genInviteUrl(linked).then(function(url){
+      navigator.clipboard.writeText(url)
+        .then(function(){ toast('Link de invitación copiado'); })
+        .catch(function(){ toast('No se pudo copiar'); });
+    });
+    return;
+  }
   const url = cmGetInviteUrl();
   if (!url) return;
   const full = location.origin + '/' + url;
@@ -4322,7 +4351,7 @@ function showPage(id) {
     });
     setTimeout(loadDestinations, 100);
   }
-  if (id === 'invites') renderInvitesPage();
+  if (id === 'invites') refreshInvitesFromCloud().then(function(){ renderInvitesPage(); });
   if (id === 'fiestas') loadFiestasPage();
   if (id === 'calendario') loadCalendarioPage();
   if (id === 'clientes') { loadClientesPage(); _startClientesPoller(); } else { _stopClientesPoller(); }
@@ -6442,6 +6471,17 @@ function getInvites() {
 }
 function saveInvites(list) { S.set(INV_KEY, list); }
 
+// [COMPARTIDA] Refresca crd_invites del cloud antes de leer/mutar la lista.
+// El worker también puede escribir esta clave (auto-crea la invitación al dar
+// de alta un cliente): mutar desde una copia local vieja pisaría esas invitaciones.
+async function refreshInvitesFromCloud() {
+  try {
+    const cloud = await fetchFromCloud(INV_KEY);
+    if (Array.isArray(cloud)) localStorage.setItem(INV_KEY, JSON.stringify(cloud));
+  } catch(e) {}
+  return getInvites();
+}
+
 function toSlug(str) {
   return str.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -7021,10 +7061,10 @@ async function loadRsvpSummary(slug) {
   } catch(e) {}
 }
 
-function saveInvite() {
+async function saveInvite() {
   const data = readInviteForm();
   if (!data.config.novios && !data.config.titulo) { toast('Ingresá al menos un nombre o título'); return; }
-  const list = getInvites();
+  const list = await refreshInvitesFromCloud();
   let savedId;
   if (invEditingId) {
     savedId = invEditingId;
@@ -7053,10 +7093,10 @@ function saveInvite() {
   toast('Invitación guardada ✓');
 }
 
-function saveAndPreviewInvite() {
+async function saveAndPreviewInvite() {
   const data = readInviteForm();
   if (!data.config.novios && !data.config.titulo) { toast('Ingresá al menos un nombre o título'); return; }
-  const list = getInvites();
+  const list = await refreshInvitesFromCloud();
   let savedId;
   if (invEditingId) {
     savedId = invEditingId;
@@ -7096,8 +7136,8 @@ function copyInviteUrl(id) {
   genInviteUrl(inv).then(url => navigator.clipboard.writeText(url).then(() => toast('URL copiada ✓')));
 }
 
-function duplicateInvite(id) {
-  const list = getInvites();
+async function duplicateInvite(id) {
+  const list = await refreshInvitesFromCloud();
   const inv = list.find(i => i.id === id);
   if (!inv) return;
   const copy = JSON.parse(JSON.stringify(inv));
@@ -7110,9 +7150,9 @@ function duplicateInvite(id) {
   toast('Invitación duplicada ✓');
 }
 
-function deleteInvite(id) {
+async function deleteInvite(id) {
   if (!confirm('¿Eliminar esta invitación? No se puede deshacer.')) return;
-  const list = getInvites().filter(i => i.id !== id);
+  const list = (await refreshInvitesFromCloud()).filter(i => i.id !== id);
   saveInvites(list);
   renderInvitesPage();
   toast('Eliminada');
