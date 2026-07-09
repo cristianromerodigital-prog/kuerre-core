@@ -8,7 +8,7 @@
       "_comment": "1. Version CRP (regex para no romper cuando CORE bumpea)",
       "regex": ">V1\\.\\d+<",
       "flags": "g",
-      "replace": ">V2.02<"
+      "replace": ">V2.03<"
     },
     {
       "_comment": "2. Quitar data-module (regex)",
